@@ -1,4 +1,4 @@
-// import firebaseInit from './firebase';
+import firebaseInit from './firebase';
 import Simulation from "./simulation";
 
 window.simulation = new Simulation();

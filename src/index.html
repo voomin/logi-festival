@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로지 운동회</title>
-    <!-- firebase 기본 ui -->
-    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
 </head>
 <body>
     <h1>로지 운동회</h1>
     <div class="tab-list">
+        <div id="memberBox" style="display: none;">
+            <img src="" alt="" id="profile-img">
+            <p id="name"></p>
+            <button onclick="window.logout()">로그아웃</button>
+        </div>
+        <div id="guestBox">
+            <button onclick="window.signInWithPopup()">로그인</button>
+        </div>
+        <hr>
         <button onclick="simulationClick()">시물레이션</button>
     </div>
 
@@ -40,8 +46,29 @@
         simulationClick();
     }
 
-    // window.onload = () => {
-    //     console.log('firebase onload!!');
-    //     var ui = new window.firebaseui.auth.AuthUI(window.auth);
-    // }
+    window.onSignIn = (user) => {
+        console.log(user);
+        const profileImg = document.getElementById('profile-img');
+        profileImg.src = user.photoURL;
+        const name = document.getElementById('name');
+        name.innerText = user.displayName;
+
+        const memberBox = document.getElementById('memberBox');
+        memberBox.style.display = 'block';
+        const guestBox = document.getElementById('guestBox');
+        guestBox.style.display = 'none';
+
+    }
+
+    window.onSignOut = () => {
+        console.log('sign out');
+        const memberBox = document.getElementById('memberBox');
+        memberBox.style.display = 'none';
+        const guestBox = document.getElementById('guestBox');
+        guestBox.style.display = 'block';
+    }
+
+    window.onload = () => {
+        console.log('firebase onload!!');
+    }
 </script>
