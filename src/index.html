@@ -18,9 +18,24 @@
         </div>
     </div>
     <hr>
+    <h3>배팅하기</h3>
+    <div id="bettingTeamBox" style="display: none;">
+        <p id="bettingName"></p>
+        <!-- <div id="bettingOptions">
+            <button onclick="window.betting('A')">A팀</button>
+            <button onclick="window.betting('B')">B팀</button>
+        </div> -->
+    </div>
+    <hr>
+    <h3>순위</h3>
     <div id="rankBox">
         <ol></ol>
     </div>
+
+    <!-- <hr>
+    <h3>대기 운동</h3>
+    <hr>
+    <h3>종료된 운동</h3> -->
 </body>
 </html>
 <script>
@@ -55,6 +70,13 @@
             li.innerText = `(${member.team})${member.name} : ${member.point}`;
             ol.appendChild(li);
         });
+    }
+
+    window.setGameReady = (game) => {
+        const bettingTeamBox = document.getElementById('bettingTeamBox');
+        bettingTeamBox.style.display = 'block';
+        const bettingName = document.getElementById('bettingName');
+        bettingName.innerText = game.name;
     }
 
     window.onload = () => {

@@ -64,5 +64,22 @@ window.logout = function() {
     });
 }
 
-const querySnapshot = await getDocs(collection(db, "members"));
-window.setRankBox(querySnapshot.docs.map(doc => doc.data()).sort((a, b) => b.point - a.point));
+const membersQuerySnapshot = await getDocs(collection(db, "members"));
+const members = membersQuerySnapshot.docs
+    .map(doc => doc.data())
+    .sort((a, b) => b.point - a.point);
+
+window.setRankBox(members);
+
+
+
+const gamesQuerySnapshot = await getDocs(collection(db, "games"));
+gamesQuerySnapshot.docs.forEach(doc => {
+    const game = doc.data();
+    if (game.isReady) {
+        window.setGameReady(game);
+    }
+    // window.addGame(game);
+});
+// const games = gamesQuerySnapshot.docs
+//     .map(doc => doc.data());
