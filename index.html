@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로지 운동회</title>
+    <script type="module" src="./src/simulation.js"></script>
+</head>
+<body>
+    <h1>로지 운동회</h1>
+    <div class="tab-list">
+        <button onclick="simulationClick()">시물레이션</button>
+    </div>
+
+    <hr>
+
+    <div id="simulationBox" style="display: none;">
+        <button onclick="simulationRetry()">새 게임</button>
+        <ol id="logibros">
+            <!-- <li>김부민</li> -->
+        </ol>
+    </div>
+</body>
+</html>
+<script>
+    function simulationClick(){
+        const simulationBox = document.getElementById('simulationBox');
+        simulationBox.style.display = 'block';
+
+        const info = window.simulation.getMembersInfo();
+        const logibros = document.getElementById('logibros');
+        logibros.innerHTML = info.map((member) => {
+            return `<li>(${member.team}) ${member.name} ${member.point}점</li>`;
+        }).join('\n');
+    }
+
+    function simulationRetry(){
+        window.simulation.reset();
+        simulationClick();
+    }
+</script>
