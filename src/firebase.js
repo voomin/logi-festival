@@ -1,9 +1,13 @@
 import Key from '../key.js';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 const firebaseConfig = Key.firebaseConfig;
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const provider = new GoogleAuthProvider();
 
@@ -11,7 +15,7 @@ provider.setCustomParameters({
     'login_hint': 'int@logibros.com'
 });
 
-const auth = getAuth(app);
+
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -60,4 +64,5 @@ window.logout = function() {
     });
 }
 
-console.log('firebase initialized');
+const querySnapshot = await getDocs(collection(db, "members"));
+window.setRankBox(querySnapshot.docs.map(doc => doc.data()).sort((a, b) => b.point - a.point));

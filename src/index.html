@@ -16,36 +16,14 @@
         <div id="guestBox">
             <button onclick="window.signInWithPopup()">로그인</button>
         </div>
-        <hr>
-        <button onclick="simulationClick()">시물레이션</button>
     </div>
-
     <hr>
-
-    <div id="simulationBox" style="display: none;">
-        <button onclick="simulationRetry()">새 게임</button>
-        <ol id="logibros">
-        </ol>
+    <div id="rankBox">
+        <ol></ol>
     </div>
 </body>
 </html>
 <script>
-    function simulationClick(){
-        const simulationBox = document.getElementById('simulationBox');
-        simulationBox.style.display = 'block';
-
-        const info = window.simulation.getMembersInfo();
-        const logibros = document.getElementById('logibros');
-        logibros.innerHTML = info.map((member) => {
-            return `<li>(${member.team}) ${member.name} ${member.point}점</li>`;
-        }).join('\n');
-    }
-
-    function simulationRetry(){
-        window.simulation.reset();
-        simulationClick();
-    }
-
     window.onSignIn = (user) => {
         console.log(user);
         const profileImg = document.getElementById('profile-img');
@@ -68,7 +46,17 @@
         guestBox.style.display = 'block';
     }
 
+    window.setRankBox = (members) => {
+        const rankBox = document.getElementById('rankBox');
+        const ol = rankBox.querySelector('ol');
+        ol.innerHTML = '';
+        members.forEach((member) => {
+            const li = document.createElement('li');
+            li.innerText = `(${member.team})${member.name} : ${member.point}`;
+            ol.appendChild(li);
+        });
+    }
+
     window.onload = () => {
-        console.log('firebase onload!!');
     }
 </script>
