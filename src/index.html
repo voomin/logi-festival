@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로지 운동회</title>
-    <script type="module" src="./src/simulation.js"></script>
+    <!-- firebase 기본 ui -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
 </head>
 <body>
     <h1>로지 운동회</h1>
@@ -17,7 +19,6 @@
     <div id="simulationBox" style="display: none;">
         <button onclick="simulationRetry()">새 게임</button>
         <ol id="logibros">
-            <!-- <li>김부민</li> -->
         </ol>
     </div>
 </body>
@@ -38,4 +39,9 @@
         window.simulation.reset();
         simulationClick();
     }
+
+    // window.onload = () => {
+    //     console.log('firebase onload!!');
+    //     var ui = new window.firebaseui.auth.AuthUI(window.auth);
+    // }
 </script>

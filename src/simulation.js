@@ -3,7 +3,7 @@ import TeamGame from './simulation/team_game.js';
 import SoloGame from './simulation/solo_game.js';
 import Member from './member.js';
 
-class Simulation {
+export default class Simulation {
     _members = [];
     
     _teamGame = new TeamGame();
@@ -55,5 +55,3 @@ class Simulation {
         });
     }
 }
-
-window.simulation = new Simulation();
