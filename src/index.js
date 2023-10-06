@@ -1,1 +1,1 @@
-import firebaseInit from './firebase';
+console.log('index.js');

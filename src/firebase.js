@@ -1,7 +1,7 @@
 import Key from '../key.js';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = Key.firebaseConfig;
 const app = initializeApp(firebaseConfig);
@@ -15,19 +15,30 @@ provider.setCustomParameters({
     'login_hint': 'int@logibros.com'
 });
 
+let userInGoogle = null;
+let userInFirestore = null;
+let readyGame = null;
 
 
-onAuthStateChanged(auth, (user) => {
+
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/auth.user
-      const uid = user.uid;
-      console.log('user signed in', uid);
-      window.onSignIn(user);
-      // ...
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        userInGoogle = user;
+        const uid = user.uid;
+        console.log('user signed in', uid);
+        userInFirestore = await getUserInFirestore(uid);
+        window.onSignIn(user);
+
+        const games = await getGamesInFirestore();
+        readyGame = games.find(game => game.isReady);
+        if (readyGame) {
+            window.setGameReady(readyGame);
+            window.setMyPointInBetting(userInFirestore.point);
+        }
     } else {
-      // User is signed out
-      // ...
+        userInGoogle = null;
         window.onSignOut();
         console.log('user signed out');
     }
@@ -64,6 +75,25 @@ window.logout = function() {
     });
 }
 
+async function getUserInFirestore(uid) {
+    const docRef = doc(db, "members", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        return docSnap.data();
+    } else {
+        // doc.data() will be undefined in this case
+        return null;
+    }
+}
+
+async function getGamesInFirestore() {
+    const gamesQuerySnapshot = await getDocs(collection(db, "games"));
+    const games = gamesQuerySnapshot.docs
+        .map(doc => doc.data());
+    return games;
+}
+
 const membersQuerySnapshot = await getDocs(collection(db, "members"));
 const members = membersQuerySnapshot.docs
     .map(doc => doc.data())
@@ -71,15 +101,5 @@ const members = membersQuerySnapshot.docs
 
 window.setRankBox(members);
 
-
-
-const gamesQuerySnapshot = await getDocs(collection(db, "games"));
-gamesQuerySnapshot.docs.forEach(doc => {
-    const game = doc.data();
-    if (game.isReady) {
-        window.setGameReady(game);
-    }
-    // window.addGame(game);
-});
 // const games = gamesQuerySnapshot.docs
 //     .map(doc => doc.data());

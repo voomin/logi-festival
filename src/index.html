@@ -20,7 +20,7 @@
     <hr>
     <h3>배팅하기</h3>
     <div id="bettingTeamBox" style="display: none;">
-        <p id="bettingName"></p>
+        <!-- <p id="bettingName"></p> -->
         <!-- <div id="bettingOptions">
             <button onclick="window.betting('A')">A팀</button>
             <button onclick="window.betting('B')">B팀</button>
@@ -72,11 +72,54 @@
         });
     }
 
+    window.setMyPointInBetting = (point) => {
+        const myPoint = document.getElementById('myPoint');
+        myPoint.innerText = "내 점수: " + point;
+    }
+
     window.setGameReady = (game) => {
         const bettingTeamBox = document.getElementById('bettingTeamBox');
         bettingTeamBox.style.display = 'block';
-        const bettingName = document.getElementById('bettingName');
-        bettingName.innerText = game.name;
+
+        const nameDoc = document.createElement('p');
+        nameDoc.innerText = game.name;
+        bettingTeamBox.appendChild(nameDoc);
+
+        const bettingOptions = document.createElement('div');
+        bettingOptions.id = 'bettingOptions';
+        bettingTeamBox.appendChild(bettingOptions);
+
+        game.options.forEach((option) => {
+            const radioButton = document.createElement('input');
+            radioButton.type = 'radio';
+            radioButton.name = 'betting';
+            radioButton.value = option;
+            radioButton.id = option;
+            bettingOptions.appendChild(radioButton);
+            bettingOptions.appendChild(document.createTextNode(option));
+        });
+
+        const pointInput = document.createElement('input');
+        pointInput.type = 'number';
+        pointInput.name = 'point';
+        pointInput.id = 'pointInput';
+        bettingTeamBox.appendChild(pointInput);
+
+        const myPoint = document.createElement('p');
+        myPoint.innerText = '내 포인트 : ';
+        myPoint.id = 'myPoint';
+        bettingTeamBox.appendChild(myPoint);
+
+        const submitButton = document.createElement('button');
+        submitButton.innerText = '배팅';
+        submitButton.onclick = () => {
+            const betting = document.querySelector('input[name="betting"]:checked').value;
+            // window.betting(betting);
+            alert(betting);
+        }
+        bettingTeamBox.appendChild(submitButton);
+
+        
     }
 
     window.onload = () => {
