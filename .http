@@ -1,0 +1,8 @@
+## 파이어베이스 functions 테스트
+# GET http://127.0.0.1:5001/logifestival/asia-northeast3/betting
+
+
+## 파이어베이스 functions 배포
+GET http://localhost:5001/logifestival/us-central1/helloWorld
+
+
