@@ -1,4 +1,4 @@
-import define from "./simulation/define.js";
+import define from "./define.js";
 
 export default class Member {
     _name = '';
