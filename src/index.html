@@ -63,41 +63,39 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
         <div class="container px-4 px-lg-5">
             <a class="navbar-brand" href="#page-top">로지 운동회</a>
-            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                메뉴
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
-                    <!-- <li class="nav-item"><a class="nav-link" href="#ranking">순위</a></li> -->
-                    <li class="nav-item" id="memberBox2" >
-                        
-                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
-                            배팅하기
+
+            <div class="nav-item dropdown dropstart" id="memberBox1" style="display: none;">
+                <button 
+                    class="btn dropdown-toggle rounded-circle border-0" 
+                    type="button" data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                    <img src="" alt="" id="profile-img" class="rounded-circle" style="width: 30px; height: 30px;">
+                </button>
+                <ul class="dropdown-menu ">
+                    <li id="name" class="dropdown-item-text">김부민</li>
+                    <li id="name" class="dropdown-item">
+                        <button
+                            class="btn dropdown-item"
+                            onclick="window.logout()"
+                        >
+                            로그아웃
                         </button>
                     </li>
-                    <!-- <li class="nav-item"><a class="nav-link" href="#bettingTeamBox">배팅</a></li> -->
-                    <!-- <li class="nav-item"><a class="nav-link" href="#signup">Contact</a></li> -->
+                </ul>      
+            </div>
+            <!-- <button class="navbar-toggler" 
+                type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown" id="memberBox1" style="display: none;">
-                        <button 
-                            class="btn dropdown-toggle rounded-circle border-0" 
-                            type="button" data-bs-toggle="dropdown" 
-                            aria-expanded="false">
-                            <img src="" alt="" id="profile-img" class="rounded-circle" style="width: 30px; height: 30px;">
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li id="name" class="dropdown-item-text">김부민</li>
-                            <li id="name" class="dropdown-item">
-                                <button
-                                    class="btn dropdown-item"
-                                    onclick="window.logout()"
-                                >
-                                    로그아웃
-                                </button>
-                            </li>
-                        </ul>
+                        
                     </li>
                 </ul>
-            </div>
+              </div> -->
         </div>
     </nav>
 
@@ -115,7 +113,15 @@
         </div>
     </header>
 
-    <section id="ranking" class="my-5 pt-5">
+    <div class="my-5"></div>
+
+    <section class="container mx-auto my-3 text-center" id="memberBox2" >
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
+            배팅하기
+        </button>
+    </section>
+
+    <section id="ranking" class="my-3">
         <div class="container px-4 px-lg-5">
             <h5>순위</h5>
             <div id="rankBox">
