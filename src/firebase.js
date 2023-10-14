@@ -2,12 +2,13 @@ import Key from '../key.js';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { getFunctions, httpsCallable, httpsCallableFromURL } from "firebase/functions";
 
 const firebaseConfig = Key.firebaseConfig;
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app);
 
 const provider = new GoogleAuthProvider();
 
@@ -99,7 +100,43 @@ const members = membersQuerySnapshot.docs
     .map(doc => doc.data())
     .sort((a, b) => b.point - a.point);
 
+const betting = httpsCallableFromURL(
+    functions, 
+    'https://us-central1-logifestival.cloudfunctions.net/helloWorld'
+    // 'https://betting-bsjad3jkea-uc.a.run.app/betting'
+    // 'https://us-central1-logifestival.cloudfunctions.net/betting'
+    // 'https://betting-bsjad3jkea-uc.a.run.app'
+);
+
 window.setRankBox(members);
 
 // const games = gamesQuerySnapshot.docs
 //     .map(doc => doc.data());
+
+window.betting = function(selecOption, point) {
+    betting({ 
+        // selecOption,
+        // point,
+        // gameId: readyGame.id,
+    })
+        .then((result) => {
+            // // Read result of the Cloud Function.
+            // /** @type {any} */
+            // const data = result.data;
+            // const sanitizedMessage = data.text;
+            console.log({
+                result,
+            });
+        }).catch(err => {
+            const code = error.code;
+            const message = error.message;
+            const details = error.details;
+
+            console.log({
+                err,
+                // code,
+                // message,
+                // details,
+            });
+        })
+}

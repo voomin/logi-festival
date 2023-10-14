@@ -4,38 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로지 운동회</title>
-</head>
-<body>
-    <h1>로지 운동회</h1>
-    <div class="tab-list">
-        <div id="memberBox" style="display: none;">
-            <img src="" alt="" id="profile-img">
-            <p id="name"></p>
-            <button onclick="window.logout()">로그아웃</button>
-        </div>
-        <div id="guestBox">
-            <button onclick="window.signInWithPopup()">로그인</button>
-        </div>
-    </div>
-    <hr>
-    <h3>배팅하기</h3>
-    <div id="bettingTeamBox" style="display: none;">
-        <!-- <p id="bettingName"></p> -->
-        <!-- <div id="bettingOptions">
-            <button onclick="window.betting('A')">A팀</button>
-            <button onclick="window.betting('B')">B팀</button>
-        </div> -->
-    </div>
-    <hr>
-    <h3>순위</h3>
-    <div id="rankBox">
-        <ol></ol>
-    </div>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <style>
 
-    <!-- <hr>
-    <h3>대기 운동</h3>
-    <hr>
-    <h3>종료된 운동</h3> -->
+        .masthead {
+            position: relative;
+            width: 100%;
+            height: auto;
+            min-height: 35rem;
+            padding: 15rem 0;
+            /* background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 75%, #000 100%), url("../assets/img/bg-masthead.jpg"); */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            background-size: cover;
+        }
+        .masthead h1, .masthead .h1 {
+            /* font-family: "Varela Round", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
+            font-size: 2.5rem;
+            line-height: 2.5rem;
+            letter-spacing: 0.8rem;
+            /* background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+                    background-clip: text; */
+        }
+        .masthead h2, .masthead .h2 {
+            max-width: 20rem;
+            font-size: 1rem;
+        }
+        @media (min-width: 768px) {
+            .masthead h1, .masthead .h1 {
+                font-size: 4rem;
+                line-height: 4rem;
+            }
+        }
+        @media (min-width: 992px) {
+            .masthead {
+                height: 100vh;
+                padding: 0;
+            }
+            .masthead h1, .masthead .h1 {
+                font-size: 6.5rem;
+                line-height: 6.5rem;
+                letter-spacing: 0.8rem;
+            }
+            .masthead h2, .masthead .h2 {
+                max-width: 30rem;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="#page-top">로지 운동회</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                메뉴
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <!-- <li class="nav-item"><a class="nav-link" href="#ranking">순위</a></li> -->
+                    <li class="nav-item" id="memberBox2" >
+                        
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
+                            배팅하기
+                        </button>
+                    </li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="#bettingTeamBox">배팅</a></li> -->
+                    <!-- <li class="nav-item"><a class="nav-link" href="#signup">Contact</a></li> -->
+                    <li class="nav-item dropdown" id="memberBox1" style="display: none;">
+                        <button 
+                            class="btn dropdown-toggle rounded-circle border-0" 
+                            type="button" data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                            <img src="" alt="" id="profile-img" class="rounded-circle" style="width: 30px; height: 30px;">
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li id="name" class="dropdown-item-text">김부민</li>
+                            <li id="name" class="dropdown-item">
+                                <button
+                                    class="btn dropdown-item"
+                                    onclick="window.logout()"
+                                >
+                                    로그아웃
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="masthead" id="guestBox" >
+        <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+            <div class="d-flex justify-content-center">
+                <div class="text-center">
+                    <h1 class="mx-auto my-0 text-uppercase">로지 운동회</h1>
+                    <!-- <h2 class="text-black-50 mx-auto mt-2 mb-5">Welcome 입니다~ 🤗</h2> -->
+                    <div class="mx-auto mt-5">
+                        <button class="btn btn-primary" onclick="window.signInWithPopup()">로그인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="ranking" class="my-5 pt-5">
+        <div class="container px-4 px-lg-5">
+            <h5>순위</h5>
+            <div id="rankBox">
+                <ol class="list-group list-group-numbered">
+                    <!-- <li class="list-group-item">A list item</li>
+                    <li class="list-group-item">A list item</li>
+                    <li class="list-group-item">A list item</li> -->
+                </ol>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="bettingModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">배팅</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bettingTeamBox">
+            
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" id="bettingSubmitButton">배팅하기</button>
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
@@ -46,8 +157,8 @@
         const name = document.getElementById('name');
         name.innerText = user.displayName;
 
-        const memberBox = document.getElementById('memberBox');
-        memberBox.style.display = 'block';
+        document.getElementById('memberBox1').style.display = 'block';
+        document.getElementById('memberBox2').style.display = 'block';
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'none';
 
@@ -55,8 +166,8 @@
 
     window.onSignOut = () => {
         console.log('sign out');
-        const memberBox = document.getElementById('memberBox');
-        memberBox.style.display = 'none';
+        document.getElementById('memberBox1').style.display = 'none';
+        document.getElementById('memberBox2').style.display = 'none';
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'block';
     }
@@ -67,6 +178,7 @@
         ol.innerHTML = '';
         members.forEach((member) => {
             const li = document.createElement('li');
+            li.classList.add('list-group-item');
             li.innerText = `(${member.team})${member.name} : ${member.point}`;
             ol.appendChild(li);
         });
@@ -110,16 +222,12 @@
         myPoint.id = 'myPoint';
         bettingTeamBox.appendChild(myPoint);
 
-        const submitButton = document.createElement('button');
-        submitButton.innerText = '배팅';
+        const submitButton = document.getElementById('bettingSubmitButton');
         submitButton.onclick = () => {
             const betting = document.querySelector('input[name="betting"]:checked').value;
             // window.betting(betting);
-            alert(betting);
+            window.betting(betting, pointInput.value);
         }
-        bettingTeamBox.appendChild(submitButton);
-
-        
     }
 
     window.onload = () => {
