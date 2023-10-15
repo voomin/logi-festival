@@ -3,12 +3,11 @@ const admin = require('firebase-admin');
 const cors = require('cors')({
     origin: true
 });
+const seoul = functions.region('asia-northeast3');
 
 admin.initializeApp();
 
-exports.helloWorld = functions
-    .region('asia-northeast3')
-    .https.onRequest((req, res) => {
+exports.helloWorld = seoul.https.onRequest((req, res) => {
     cors(req, res, async ()=>{
         try {
             const text = req.query.text || "default text";
@@ -33,4 +32,27 @@ exports.helloWorld = functions
         }
 
     });
+});
+
+exports.welcomeLogibros = functions.auth.user().onCreate((user) => {
+  try {
+    const { uid, displayName, email, photoURL } = user;
+
+    // if (email.endsWith('@logibros.com') === false) {
+    //     return;
+    // }
+
+    const userRef = admin.firestore().collection('members').doc(uid);
+    userRef.set({
+      uid,
+      name: displayName,
+      email,
+      photoURL,
+      point: 1000,
+      team: '',
+    });
+
+  } catch(error) {
+    console.error(error);
+  } 
 });
