@@ -1,5 +1,5 @@
 ## 파이어베이스 functions helloworld 확인
-# GET http://localhost:5001/logifestival/us-central1/helloWorld
+GET http://localhost:5001/logifestival/us-central1/helloWorld
 
 # ## betting 테스트
 # GET http://localhost:5001/logifestival/us-central1/betting
@@ -8,10 +8,10 @@
 # &selectOption=청팀
 
 ## betting 테스트
-GET https://betting-bsjad3jkea-uc.a.run.app
-?point=1000
-&gameId=abc
-&selectOption=청팀
+# GET https://betting-bsjad3jkea-uc.a.run.app
+# ?point=1000
+# &gameId=abc
+# &selectOption=청팀
 
 
 # GET https://us-central1-logifestival.cloudfunctions.net/helloWorld
