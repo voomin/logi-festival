@@ -103,14 +103,6 @@ const members = membersQuerySnapshot.docs
     .map(doc => doc.data())
     .sort((a, b) => b.point - a.point);
 
-const betting = httpsCallableFromURL(
-    functions, 
-    // 'https://asia-northeast3-logifestival.cloudfunctions.net/helloWorld',
-    'https://asia-northeast3-logifestival.cloudfunctions.net/betting',
-    // 'https://betting-bsjad3jkea-uc.a.run.app/betting'
-    // 'https://us-central1-logifestival.cloudfunctions.net/betting'
-    // 'https://betting-bsjad3jkea-uc.a.run.app'
-);
 
 window.setRankBox(members);
 
@@ -118,12 +110,19 @@ window.setRankBox(members);
 //     .map(doc => doc.data());
 
 window.betting = function(selecOption, point) {
-    betting({ 
+    const functionName = 'betting';
+    const queryParameters = {
         selecOption,
         point,
         gameId: readyGame.id,
-    })
-        .then((result) => {
+    };
+    const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
+    const functionUrl = `https://asia-northeast3-logifestival.cloudfunctions.net/${functionName}?${queryString}`;
+
+    httpsCallableFromURL(
+        functions, 
+        functionUrl,
+    )().then((result) => {
             // // Read result of the Cloud Function.
             // /** @type {any} */
             // const data = result.data;
