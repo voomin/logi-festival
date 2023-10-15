@@ -36,7 +36,10 @@ onAuthStateChanged(auth, async (user) => {
         readyGame = games.find(game => game.isReady);
         if (readyGame) {
             window.setGameReady(readyGame);
-            window.setMyPointInBetting(userInFirestore.point);
+            
+            if (setMyPointInBetting) {
+                window.setMyPointInBetting(userInFirestore.point);
+            }
         }
     } else {
         userInGoogle = null;
@@ -102,7 +105,8 @@ const members = membersQuerySnapshot.docs
 
 const betting = httpsCallableFromURL(
     functions, 
-    'https://us-central1-logifestival.cloudfunctions.net/helloWorld'
+    // 'https://asia-northeast3-logifestival.cloudfunctions.net/helloWorld',
+    'https://asia-northeast3-logifestival.cloudfunctions.net/betting',
     // 'https://betting-bsjad3jkea-uc.a.run.app/betting'
     // 'https://us-central1-logifestival.cloudfunctions.net/betting'
     // 'https://betting-bsjad3jkea-uc.a.run.app'
@@ -115,9 +119,9 @@ window.setRankBox(members);
 
 window.betting = function(selecOption, point) {
     betting({ 
-        // selecOption,
-        // point,
-        // gameId: readyGame.id,
+        selecOption,
+        point,
+        gameId: readyGame.id,
     })
         .then((result) => {
             // // Read result of the Cloud Function.
@@ -128,9 +132,9 @@ window.betting = function(selecOption, point) {
                 result,
             });
         }).catch(err => {
-            const code = error.code;
-            const message = error.message;
-            const details = error.details;
+            // const code = error.code;
+            // const message = error.message;
+            // const details = error.details;
 
             console.log({
                 err,

@@ -1,19 +1,12 @@
 ## 파이어베이스 functions helloworld 확인
-GET http://127.0.0.1:5001/logifestival/asia-northeast3/helloWorld
-?text=bm
+# GET http://127.0.0.1:5001/logifestival/asia-northeast3/helloWorld
+# ?text=bm
 
 # helloworld 운영
 # GET https://us-central1-logifestival.cloudfunctions.net/helloWorld
 
 ## betting 테스트
-# GET http://localhost:5001/logifestival/us-central1/betting
-# ?point=1000
-# &gameId=abc
-# &selectOption=청팀
-
-## betting 테스트
-# GET https://betting-bsjad3jkea-uc.a.run.app
-# ?point=1000
-# &gameId=abc
-# &selectOption=청팀
-
+GET http://localhost:5001/logifestival/asia-northeast3/betting
+?point=1000
+&gameId=abc
+&selectOption=청팀
