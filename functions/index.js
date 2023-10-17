@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require('firebase-admin');
 const cors = require('cors')({
     origin: true
@@ -6,15 +7,6 @@ const cors = require('cors')({
 const seoul = functions.region('asia-northeast3');
 
 admin.initializeApp();
-
-async function getUid(req) {
-    // 사용자의 ID 토큰을 요청에서 가져옵니다.
-    const idToken = req.get('Authorization');
-
-    // Firebase Authentication을 사용하여 사용자를 인증합니다.
-    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-    return decodedIdToken.uid || null;
-}
 
 exports.helloWorld = seoul.https.onRequest((req, res) => {
     cors(req, res, async ()=>{
@@ -67,24 +59,43 @@ exports.welcomeLogibros = seoul.auth.user().onCreate((user) => {
 });
 
 exports.betting = seoul.https.onRequest((req, res) => {
+    let logs = [];
     cors(req, res, async ()=>{
         try {
-            const { selecOption, point, gameId } = req.body;
+            const { selecOption, point, gameId } = req.query;
             if (!selecOption || !point || !gameId) {
                 throw new Error('selecOption, point, gameId가 필요합니다.');
             }
+
+            // 요청에서 사용자 ID 토큰 가져오기
+            let idToken = req.headers.authorization;
+            if (idToken.startsWith('Bearer ')) {
+                // Remove Bearer from string
+                idToken = idToken.slice(7, idToken.length);
+            }
             
-            const uid = getUid(req);
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const uid = decodedToken.uid;
 
-            const userRef = admin.firestore().collection('members').doc(uid); 
+            logs.push(`uid: ${uid}`);
+            if (!uid) {
+                throw new Error('uid가 존재하지 않습니다.');
+            }
+
+            const userRef = admin.firestore().collection('members').doc(uid);
             const gameRef = admin.firestore().collection('games').doc(gameId);
-            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games');
+            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(gameId);
             const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('members').doc(uid);
-
             
             await admin.firestore().runTransaction(async (transaction) => {
                 const gameDoc = await transaction.get(gameRef);
+                if (!gameDoc.exists) {
+                    throw new Error('게임이 존재하지 않습니다.');
+                }
                 const userDoc = await transaction.get(userRef);
+                if (!userDoc.exists) {
+                    throw new Error('유저가 존재하지 않습니다.');
+                }
                 const game = gameDoc.data();
                 const user = userDoc.data();
                 const log = {
@@ -105,26 +116,25 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 user.point -= point;
 
                 await transaction.update(userRef, user);
-                await transaction.set(logInMemberRef.add(log));
+                await transaction.set(logInMemberRef, log);
                 await transaction.set(logInGameRef, log);
             });
 
-            if (uid) {
-                res.json({
-                    selecOption,
-                    point,
-                    gameId,
-                    uid,
-                });
-            } else {
-                throw new Error('uid가 존재하지 않습니다.');
-            }
+
+            res.json({
+                selecOption,
+                point,
+                gameId,
+                uid,
+            });
+
         } catch(error) {
             console.error(error);
             res
                 .status(500)
                 .json({
                     error: error.message,
+                    logs,
                 });
         }
     });

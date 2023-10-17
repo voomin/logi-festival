@@ -72,8 +72,13 @@
                     <img src="" alt="" id="profile-img" class="rounded-circle" style="width: 30px; height: 30px;">
                 </button>
                 <ul class="dropdown-menu ">
-                    <li id="name" class="dropdown-item-text">김부민</li>
-                    <li id="name" class="dropdown-item">
+                    <li class="dropdown-item-text">
+                        <div class="col">
+                            <p id="name">이름없음</p>
+                            <p id="email">--@logibros.com</p>
+                        </div>
+                    </li>
+                    <li class="dropdown-item">
                         <button
                             class="btn dropdown-item"
                             onclick="window.logout()"
@@ -162,6 +167,8 @@
         profileImg.src = user.photoURL;
         const name = document.getElementById('name');
         name.innerText = user.displayName;
+        const email = document.getElementById('email');
+        email.innerText = user.email;
 
         document.getElementById('memberBox1').style.display = 'block';
         document.getElementById('memberBox2').style.display = 'block';
