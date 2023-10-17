@@ -109,37 +109,40 @@ window.setRankBox(members);
 // const games = gamesQuerySnapshot.docs
 //     .map(doc => doc.data());
 
-window.betting = function(selecOption, point) {
-    const functionName = 'betting';
-    const queryParameters = {
-        selecOption,
-        point,
-        gameId: readyGame.id,
-    };
-    const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
-    const functionUrl = `https://asia-northeast3-logifestival.cloudfunctions.net/${functionName}?${queryString}`;
+window.betting = async function(selecOption, point) {
+    return new Promise((resolve, reject) => {
+        const functionName = 'betting';
+        const queryParameters = {
+            selecOption,
+            point,
+            gameId: readyGame.id,
+        };
+        const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
+        // const baseUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
+        const baseUrl = 'http://localhost:5001/logifestival/asia-northeast3/betting';
+        const functionUrl = `${baseUrl}/${functionName}?${queryString}`;
 
-    httpsCallableFromURL(
-        functions, 
-        functionUrl,
-    )().then((result) => {
-            // // Read result of the Cloud Function.
-            // /** @type {any} */
-            // const data = result.data;
-            // const sanitizedMessage = data.text;
-            console.log({
-                result,
-            });
-        }).catch(err => {
-            // const code = error.code;
-            // const message = error.message;
-            // const details = error.details;
-
-            console.log({
-                err,
-                // code,
-                // message,
-                // details,
-            });
-        })
+        httpsCallableFromURL(
+            functions, 
+            functionUrl,
+        )()
+            .then((result) => {
+                // // Read result of the Cloud Function.
+                // /** @type {any} */
+                // const data = result.data;
+                // const sanitizedMessage = data.text;
+                console.log({
+                    result,
+                });
+                resolve(result.data);
+            }).catch(err => {
+                console.log({
+                    err,
+                    // code,
+                    // message,
+                    // details,
+                });
+                resolve(err.data);
+            })
+    });
 }

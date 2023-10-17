@@ -66,6 +66,9 @@ exports.betting = seoul.https.onRequest((req, res) => {
             if (!selecOption || !point || !gameId) {
                 throw new Error('selecOption, point, gameId가 필요합니다.');
             }
+            if (point <= 0) {
+                throw new Error('비정상적인 값입니다.');
+            }
 
             // 요청에서 사용자 ID 토큰 가져오기
             let idToken = req.headers.authorization;
@@ -87,6 +90,8 @@ exports.betting = seoul.https.onRequest((req, res) => {
             const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(gameId);
             const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('members').doc(uid);
             
+            let myPoint = 0;
+
             await admin.firestore().runTransaction(async (transaction) => {
                 const gameDoc = await transaction.get(gameRef);
                 if (!gameDoc.exists) {
@@ -118,23 +123,26 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 await transaction.update(userRef, user);
                 await transaction.set(logInMemberRef, log);
                 await transaction.set(logInGameRef, log);
+
+                myPoint = user.point;
             });
 
 
             res.json({
-                selecOption,
-                point,
-                gameId,
-                uid,
+                data: {
+                    myPoint,
+                }
             });
 
         } catch(error) {
-            console.error(error);
             res
-                .status(500)
+                // .status(500)
                 .json({
-                    error: error.message,
-                    logs,
+                    data: {
+                        isErr: true,
+                        message: error.message,
+                        logs,
+                    }
                 });
         }
     });

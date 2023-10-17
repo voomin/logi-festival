@@ -120,7 +120,7 @@
 
     <div class="my-5"></div>
 
-    <section class="container mx-auto my-3 text-center" id="memberBox2" >
+    <section class="container mx-auto my-3 text-center" id="memberBox2" style="display: none;">
         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
             배팅하기
         </button>
@@ -154,6 +154,9 @@
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             <button type="button" class="btn btn-primary" id="bettingSubmitButton">배팅하기</button>
+            <div class="spinner-border text-primary" role="status" id="bettingSubmitSpinner" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+              </div>
             </div>
         </div>
         </div>
@@ -236,10 +239,35 @@
         bettingTeamBox.appendChild(myPoint);
 
         const submitButton = document.getElementById('bettingSubmitButton');
-        submitButton.onclick = () => {
-            const betting = document.querySelector('input[name="betting"]:checked').value;
-            // window.betting(betting);
-            window.betting(betting, pointInput.value);
+        submitButton.onclick = async () => {
+            const spinner = document.getElementById('bettingSubmitSpinner');
+            const selectOptionDoc = document.querySelector('input[name="betting"]:checked');
+            let selectOption = '';
+            if (selectOptionDoc) {
+                selectOption = selectOptionDoc.value;
+            } else {
+                alert('옵션을 선택해주세요.');
+                return;
+            }
+            if (pointInput.value === '') {
+                alert('포인트를 입력해주세요.');
+                return;
+            }
+
+            spinner.style.display = 'inline-block';
+            submitButton.style.display = 'none';
+
+            const data = await window.betting(betting, pointInput.value);
+            if (data.isErr) {
+                alert('배팅에 실패했습니다. ' + data.message);
+            } else {
+                window.setMyPointInBetting(data.myPoint);
+                alert('정상적으로 배팅 완료되었습니다.')
+            }
+
+            spinner.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+
         }
     }
 
