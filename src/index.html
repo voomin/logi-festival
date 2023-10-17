@@ -140,7 +140,7 @@
         <div class="container px-4 px-lg-5">
             <h5>순위</h5>
             <div id="rankBox">
-                <ol class="list-group list-group-numbered">
+                <ol class="list-group">
                     <!-- <li class="list-group-item">A list item</li>
                     <li class="list-group-item">A list item</li>
                     <li class="list-group-item">A list item</li> -->
@@ -155,10 +155,24 @@
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">배팅</h1>
+            <h1 class="modal-title fs-5" id="bettingModalLabel">배팅</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="bettingTeamBox">
+            <div class="modal-body">
+                <p class="mb-3">선택해주세요.</p>
+
+                <div id="bettingTeamBox">
+
+                </div>
+
+                <div class="my-3">
+                    <!-- <label for="basic-url" class="form-label">Your vanity URL</label> -->
+                    <div class="input-group">
+                    <span class="input-group-text" id="basic-addon3">배팅할 포인트</span>
+                    <input type="number" class="form-control" id="pointInput" aria-describedby="basic-addon3 basic-addon4">
+                    </div>
+                    <div class="form-text" id="basic-addon4">내 포인트 : <span id="myPoint"></span></div>
+                </div>
             
             </div>
             <div class="modal-footer">
@@ -184,6 +198,29 @@
                 <div class="spinner-border" role="status" >
                     <span class="visually-hidden">Loading...</span>
                   </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- 회원 정보 모달  -->
+    <div class="modal fade" id="memberDetailModal" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="memberDetailModalLabel">정보</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="memberPoint"></p>
+                <div id="memberDetailModalBody">
+                    <div class="spinner-border" role="status" >
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -222,17 +259,69 @@
         const rankBox = document.getElementById('rankBox');
         const ol = rankBox.querySelector('ol');
         ol.innerHTML = '';
-        members.forEach((member) => {
+        members.forEach((member, index) => {
             const li = document.createElement('li');
             li.classList.add('list-group-item');
-            li.innerText = `(${member.team})${member.name} : ${member.point}`;
+            li.classList.add('d-flex');
+            li.classList.add('justify-content-between');
+            li.classList.add('align-items-center');
+            li.innerText = `${index+1}. ${member.name} (${member.point})`;
+
+            const btnGroup = document.createElement('div');
+            btnGroup.classList.add('btn-group');
+            btnGroup.classList.add('btn-group-sm');
+            btnGroup.setAttribute('role', 'group');
+            btnGroup.setAttribute('aria-label', 'Basic example');
+
+            const infoButton = document.createElement('button');
+            infoButton.classList.add('btn');
+            infoButton.classList.add('btn-info');
+            infoButton.setAttribute('data-bs-toggle', 'modal');
+            infoButton.setAttribute('data-bs-target', '#memberDetailModal');
+            infoButton.innerText = '정보보기';
+            infoButton.onclick = async () => {
+                memberPoint.innerText = `포인트 : ${member.point}`;
+
+                const logs = await window.getLogsInMember(member.uid);
+                console.log({
+                    logs
+                });
+
+                const memberDetailModalBody = document.getElementById('memberDetailModalBody');
+                memberDetailModalBody.innerHTML = '';
+                const memberDetailModalLabel = document.getElementById('memberDetailModalLabel');
+                memberDetailModalLabel.innerText = member.name + ' 정보';
+
+                if (logs.length === 0) {
+                    const logDoc = document.createElement('div');
+                    logDoc.classList.add('list-group-item');
+                    logDoc.innerText = '이력이 없습니다.';
+                    memberDetailModalBody.appendChild(logDoc);
+                }
+                
+                const logsDoc = document.createElement('ul');
+                logsDoc.classList.add('list-group');
+                memberDetailModalBody.appendChild(logsDoc);
+                logs.forEach((log) => {
+                    const logDoc = document.createElement('div');
+                    logDoc.classList.add('list-group-item');
+                    logDoc.innerText = `${log.gameName}에 '${log.selecOption}'(으)로 ${log.bettingPoint} 배팅했습니다. (남은 포인트 : ${log.userPoint}))`;
+                    logsDoc.appendChild(logDoc);
+                });
+            }
+
+            btnGroup.appendChild(infoButton);
+            li.appendChild(btnGroup);
+
+
+
             ol.appendChild(li);
         });
     }
 
     window.setMyPointInBetting = (point) => {
         const myPoint = document.getElementById('myPoint');
-        myPoint.innerText = "내 점수: " + point;
+        myPoint.innerText = point;
     }
 
     window.setGames = (games) => {
@@ -273,6 +362,12 @@
                 const gameDetailModalLabel = document.getElementById('gameDetailModalLabel');
                 gameDetailModalLabel.innerText = game.name + ' 상세이력';
                 
+                if (logs.length === 0) {
+                    const logDoc = document.createElement('div');
+                    logDoc.classList.add('list-group-item');
+                    logDoc.innerText = '이력이 없습니다.';
+                    gameDetailModalBody.appendChild(logDoc);
+                }
                 const logsDoc = document.createElement('ul');
                 logsDoc.classList.add('list-group');
                 gameDetailModalBody.appendChild(logsDoc);
@@ -304,39 +399,35 @@
     }
 
     window.setGameReady = (game) => {
+        const label = document.getElementById('bettingModalLabel');
+        label.innerText = game.name + ' 배팅';
         const bettingTeamBox = document.getElementById('bettingTeamBox');
         bettingTeamBox.innerHTML = '';
-        bettingTeamBox.style.display = 'block';
-
-        const nameDoc = document.createElement('p');
-        nameDoc.innerText = game.name;
-        bettingTeamBox.appendChild(nameDoc);
 
         const bettingOptions = document.createElement('div');
         bettingOptions.id = 'bettingOptions';
         bettingTeamBox.appendChild(bettingOptions);
 
         game.options.forEach((option) => {
-            const radioButton = document.createElement('input');
-            radioButton.type = 'radio';
-            radioButton.name = 'betting';
-            radioButton.value = option;
-            radioButton.id = option;
-            bettingOptions.appendChild(radioButton);
-            bettingOptions.appendChild(document.createTextNode(option));
+            const formCheck = document.createElement('div');
+            formCheck.classList.add('form-check');
+            const formCheckInput = document.createElement('input');
+            formCheckInput.classList.add('form-check-input');
+            formCheckInput.type = 'radio';
+            formCheckInput.name = 'betting';
+            formCheckInput.value = option;
+            formCheckInput.id = option;
+            formCheck.appendChild(formCheckInput);
+            const formCheckLabel = document.createElement('label');
+            formCheckLabel.classList.add('form-check-label');
+            formCheckLabel.setAttribute('for', option);
+            formCheckLabel.innerText = option;
+            formCheck.appendChild(formCheckLabel);
+        
+            bettingOptions.appendChild(formCheck);
         });
 
-        const pointInput = document.createElement('input');
-        pointInput.type = 'number';
-        pointInput.name = 'point';
-        pointInput.id = 'pointInput';
-        bettingTeamBox.appendChild(pointInput);
-
-        const myPoint = document.createElement('p');
-        myPoint.innerText = '내 포인트 : ';
-        myPoint.id = 'myPoint';
-        bettingTeamBox.appendChild(myPoint);
-
+        const pointInput = document.getElementById('pointInput');
         const submitButton = document.getElementById('bettingSubmitButton');
         submitButton.onclick = async () => {
             const spinner = document.getElementById('bettingSubmitSpinner');

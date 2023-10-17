@@ -112,11 +112,12 @@ exports.betting = seoul.https.onRequest((req, res) => {
                     selecOption,
                     bettingPoint: point,
                     bettingRate: game.bettingRate,
-                    gameNmae: game.name,
+                    gameName: game.name,
                     userName: user.name,
                     userPoint: user.point,
                     gameId,
                     uid,
+                    createdAt: new Date(),
                 };
 
                 if (user.point < point) {

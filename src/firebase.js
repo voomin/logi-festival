@@ -34,12 +34,13 @@ onAuthStateChanged(auth, async (user) => {
 
         const games = await getGamesInFirestore();
         window.setGames(games);
+        window.setMyPointInBetting(userInFirestore.point);
         // readyGame = games.find(game => game.isReady);
         // if (readyGame) {
         //     window.setGameReady(readyGame);
             
         //     if (setMyPointInBetting) {
-        //         window.setMyPointInBetting(userInFirestore.point);
+        //         
         //     }
         // }
     } else {
@@ -113,7 +114,15 @@ window.setRankBox(members);
 window.getLogsInGame = async function(gameId) {
     const logInGameQuerySnapshot = await getDocs(collection(db, "games", gameId, "members"));
     return logInGameQuerySnapshot.docs
-        .map(doc => doc.data());
+        .map(doc => doc.data())
+        .sort((a, b) => b.createdAt - a.createdAt);
+}
+
+window.getLogsInMember = async function(uid) {
+    const logInMemberQuerySnapshot = await getDocs(collection(db, "members", uid, "games"));
+    return logInMemberQuerySnapshot.docs
+        .map(doc => doc.data())
+        .sort((a, b) => b.createdAt - a.createdAt);
 }
 
 window.betting = async function(gameId, selecOption, point) {
