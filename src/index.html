@@ -120,10 +120,20 @@
 
     <div class="my-5"></div>
 
-    <section class="container mx-auto my-3 text-center" id="memberBox2" style="display: none;">
+    <!-- <section class="container mx-auto my-3 text-center" id="memberBox2" style="display: none;">
         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
             배팅하기
         </button>
+    </section> -->
+
+    <section class="my-3">
+        <div class="container px-4 px-lg-5">
+            <h5>운동</h5>
+            <div id="gameListBox">
+                <ul class="list-group">
+                </ul>
+            </div>
+        </div>
     </section>
 
     <section id="ranking" class="my-3">
@@ -140,7 +150,7 @@
     </section>
 
 
-    <!-- Modal -->
+    <!-- 배팅 모달 -->
     <div class="modal fade" id="bettingModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
@@ -161,6 +171,26 @@
         </div>
         </div>
     </div>
+
+    <!-- 운동 상세 모달  -->
+    <div class="modal fade" id="gameDetailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="gameDetailModalLabel">상세이력</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="gameDetailModalBody">
+                <div class="spinner-border" role="status" >
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
@@ -174,7 +204,7 @@
         email.innerText = user.email;
 
         document.getElementById('memberBox1').style.display = 'block';
-        document.getElementById('memberBox2').style.display = 'block';
+        // document.getElementById('memberBox2').style.display = 'block';
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'none';
 
@@ -183,7 +213,7 @@
     window.onSignOut = () => {
         console.log('sign out');
         document.getElementById('memberBox1').style.display = 'none';
-        document.getElementById('memberBox2').style.display = 'none';
+        // document.getElementById('memberBox2').style.display = 'none';
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'block';
     }
@@ -205,8 +235,77 @@
         myPoint.innerText = "내 점수: " + point;
     }
 
+    window.setGames = (games) => {
+        const gameListBox = document.getElementById('gameListBox');
+        const ul = gameListBox.querySelector('ul');
+        ul.innerHTML = '';
+        games.forEach((game) => {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item');
+            li.classList.add('d-flex');
+            li.classList.add('justify-content-between');
+            li.classList.add('align-items-center');
+            li.innerText = game.name;
+            ul.appendChild(li);
+
+            const btnGroup = document.createElement('div');
+            btnGroup.classList.add('btn-group');
+            btnGroup.classList.add('btn-group-sm');
+            btnGroup.setAttribute('role', 'group');
+            btnGroup.setAttribute('aria-label', 'Basic example');   
+            li.appendChild(btnGroup);
+
+            const detailButton = document.createElement('button');
+            detailButton.classList.add('btn');
+            detailButton.classList.add('btn-info');
+            detailButton.setAttribute('data-bs-toggle', 'modal');
+            detailButton.setAttribute('data-bs-target', '#gameDetailModal');
+            detailButton.innerText = '이력보기';
+            detailButton.onclick = async () => {
+                // window.setGameReady(game);
+                const logs = await window.getLogsInGame(game.id);
+                console.log({
+                    logs
+                });
+                
+                const gameDetailModalBody = document.getElementById('gameDetailModalBody');
+                gameDetailModalBody.innerHTML = '';
+                const gameDetailModalLabel = document.getElementById('gameDetailModalLabel');
+                gameDetailModalLabel.innerText = game.name + ' 상세이력';
+                
+                const logsDoc = document.createElement('ul');
+                logsDoc.classList.add('list-group');
+                gameDetailModalBody.appendChild(logsDoc);
+                logs.forEach((log) => {
+                    const logDoc = document.createElement('div');
+                    logDoc.classList.add('list-group-item');
+                    logDoc.innerText = `${log.userName}님이 '${log.selecOption}'에 ${log.bettingPoint} 배팅했습니다.`;
+                    logsDoc.appendChild(logDoc);
+                });
+
+            }
+            btnGroup.appendChild(detailButton);
+
+            const bettingButton = document.createElement('button');
+            bettingButton.classList.add('btn');
+            bettingButton.classList.add('btn-primary');
+            // class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal"
+            bettingButton.setAttribute('data-bs-toggle', 'modal');
+            bettingButton.setAttribute('data-bs-target', '#bettingModal');
+
+            bettingButton.innerText = '배팅하기';
+            bettingButton.onclick = () => {
+                window.setGameReady(game);
+
+            }
+            btnGroup.appendChild(bettingButton);
+            
+        });
+    }
+
     window.setGameReady = (game) => {
         const bettingTeamBox = document.getElementById('bettingTeamBox');
+        bettingTeamBox.innerHTML = '';
         bettingTeamBox.style.display = 'block';
 
         const nameDoc = document.createElement('p');
@@ -257,7 +356,11 @@
             spinner.style.display = 'inline-block';
             submitButton.style.display = 'none';
 
-            const data = await window.betting(betting, pointInput.value);
+            const data = await window.betting(
+                game.id,
+                selectOption, 
+                pointInput.value,
+            );
             if (data.isErr) {
                 alert('배팅에 실패했습니다. ' + data.message);
             } else {

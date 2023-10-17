@@ -33,14 +33,15 @@ onAuthStateChanged(auth, async (user) => {
         window.onSignIn(user);
 
         const games = await getGamesInFirestore();
-        readyGame = games.find(game => game.isReady);
-        if (readyGame) {
-            window.setGameReady(readyGame);
+        window.setGames(games);
+        // readyGame = games.find(game => game.isReady);
+        // if (readyGame) {
+        //     window.setGameReady(readyGame);
             
-            if (setMyPointInBetting) {
-                window.setMyPointInBetting(userInFirestore.point);
-            }
-        }
+        //     if (setMyPointInBetting) {
+        //         window.setMyPointInBetting(userInFirestore.point);
+        //     }
+        // }
     } else {
         userInGoogle = null;
         window.onSignOut();
@@ -109,13 +110,19 @@ window.setRankBox(members);
 // const games = gamesQuerySnapshot.docs
 //     .map(doc => doc.data());
 
-window.betting = async function(selecOption, point) {
+window.getLogsInGame = async function(gameId) {
+    const logInGameQuerySnapshot = await getDocs(collection(db, "games", gameId, "members"));
+    return logInGameQuerySnapshot.docs
+        .map(doc => doc.data());
+}
+
+window.betting = async function(gameId, selecOption, point) {
     return new Promise((resolve, reject) => {
         const functionName = 'betting';
         const queryParameters = {
             selecOption,
             point,
-            gameId: readyGame.id,
+            gameId,
         };
         const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
         // const baseUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
