@@ -231,8 +231,10 @@
 </body>
 </html>
 <script>
+    let uid = null;
     window.onSignIn = (user) => {
         console.log(user);
+        uid = user.uid;
         const profileImg = document.getElementById('profile-img');
         profileImg.src = user.photoURL;
         const name = document.getElementById('name');
@@ -249,6 +251,7 @@
 
     window.onSignOut = () => {
         console.log('sign out');
+        uid = null;
         document.getElementById('memberBox1').style.display = 'none';
         // document.getElementById('memberBox2').style.display = 'none';
         const guestBox = document.getElementById('guestBox');
@@ -306,6 +309,21 @@
                     const logDoc = document.createElement('div');
                     logDoc.classList.add('list-group-item');
                     logDoc.innerText = `${log.gameName}에 '${log.selecOption}'(으)로 ${log.bettingPoint} 배팅했습니다. (남은 포인트 : ${log.userPoint}))`;
+
+                    const cancelBettingButton = document.createElement('button');
+                    cancelBettingButton.classList.add('btn');
+                    cancelBettingButton.classList.add('btn-sm');
+                    cancelBettingButton.classList.add('btn-outline-secondary');
+                    cancelBettingButton.innerText = 'x';
+                    cancelBettingButton.onclick = async () => {
+                        const data = await window.cancelBetting(log.id);
+                        if (data.isErr) {
+                            alert('취소에 실패했습니다. ' + data.message);
+                        } else {
+                            alert('정상적으로 취소되었습니다.');
+                        }
+                    }
+                    logDoc.appendChild(cancelBettingButton);
                     logsDoc.appendChild(logDoc);
                 });
             }

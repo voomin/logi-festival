@@ -153,3 +153,76 @@ exports.betting = seoul.https.onRequest((req, res) => {
         }
     });
 });
+
+exports.cancelBet = seoul.https.onRequest((req, res) => {
+    cors(req, res, async ()=>{
+        try {
+            const { logId } = req.query;
+            if (!logId) {
+                throw new Error('logId가 필요합니다.');
+            }
+
+            // 요청에서 사용자 ID 토큰 가져오기
+            let idToken = req.headers.authorization;
+            if (idToken.startsWith('Bearer ')) {
+                // Remove Bearer from string
+                idToken = idToken.slice(7, idToken.length);
+            }
+            
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const uid = decodedToken.uid;
+            const userRef = admin.firestore().collection('members').doc(uid);
+            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(logId);
+            
+            let myPoint = 0;
+
+            await admin.firestore().runTransaction(async (transaction) => {
+                const logInMemberDoc = await transaction.get(logInMemberRef);
+                if (!logInMemberDoc.exists) {
+                    throw new Error('로그가 존재하지 않습니다.(logInMemberDoc)');
+                }
+                const log = logInMemberDoc.data();
+                const logInGameRef = admin.firestore().collection('games').doc(log.gameId).collection('members').doc(logId);
+                // const logInGameDoc = await transaction.get(logInGameRef);
+                // if (!logInGameDoc.exists) {
+                //     throw new Error('로그가 존재하지 않습니다.(logInGameDoc)');
+                // }
+                // const game = gameDoc.data();
+                const userDoc = await transaction.get(userRef);
+                if (!userDoc.exists) {
+                    throw new Error('유저가 존재하지 않습니다.');
+                }
+                const user = userDoc.data();
+                // const logInMember = logInMemberDoc.data();
+                // const logInGame = logInGameDoc.data();
+
+                // if (logInMember.uid !== uid) {
+                //     throw new Error('로그가 존재하지 않습니다.');
+                // }
+
+                const point = Number(log.bettingPoint);
+
+                user.point =Number(user.point) + point;
+
+                await transaction.update(userRef, user);
+                await transaction.delete(logInMemberRef);
+                await transaction.delete(logInGameRef);
+
+                myPoint = user.point;
+            });
+            res.json({
+                data: {
+                    myPoint,
+                }
+            });
+        } catch(error) {
+            res
+                .json({
+                    data: {
+                        isErr: true,
+                        message: error.message,
+                    }
+                });
+        }
+    });
+});

@@ -162,3 +162,39 @@ window.betting = async function(gameId, selecOption, point) {
             })
     });
 }
+
+window.cancelBetting = async function(logId) {
+    return new Promise((resolve, reject) => {
+        const functionName = 'cancelBet';
+        const queryParameters = {
+            logId,
+        };
+        const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
+        // const baseUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
+        const baseUrl = 'http://localhost:5001/logifestival/asia-northeast3/cancelBet';
+        const functionUrl = `${baseUrl}/${functionName}?${queryString}`;
+
+        httpsCallableFromURL(
+            functions, 
+            functionUrl,
+        )()
+            .then((result) => {
+                // // Read result of the Cloud Function.
+                // /** @type {any} */
+                // const data = result.data;
+                // const sanitizedMessage = data.text;
+                console.log({
+                    result,
+                });
+                resolve(result.data);
+            }).catch(err => {
+                console.log({
+                    err,
+                    // code,
+                    // message,
+                    // details,
+                });
+                resolve(err.data);
+            })
+    });
+}
