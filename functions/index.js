@@ -4,6 +4,8 @@ const admin = require('firebase-admin');
 const cors = require('cors')({
     origin: true
 });
+const { v4: uuidv4 } = require('uuid');
+
 const seoul = functions.region('asia-northeast3');
 
 admin.initializeApp();
@@ -87,8 +89,10 @@ exports.betting = seoul.https.onRequest((req, res) => {
 
             const userRef = admin.firestore().collection('members').doc(uid);
             const gameRef = admin.firestore().collection('games').doc(gameId);
-            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(gameId);
-            const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('members').doc(uid);
+            const logId = uuidv4();
+
+            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(logId);
+            const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('members').doc(logId);
             
             let myPoint = 0;
 
@@ -104,6 +108,7 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 const game = gameDoc.data();
                 const user = userDoc.data();
                 const log = {
+                    id: logId,
                     selecOption,
                     bettingPoint: point,
                     bettingRate: game.bettingRate,
