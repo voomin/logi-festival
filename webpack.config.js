@@ -13,7 +13,6 @@ module.exports = {
     },
     entry: {
         index: "./src/index.js",
-        firebase: "./src/firebase.js",
         // another: "./src/another-module.js"
     },
     output: {
@@ -24,6 +23,12 @@ module.exports = {
         splitChunks: {
             chunks: "all"
         }
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+        'key': path.resolve(__dirname, './key.js'),
+      },
     },
     plugins: [
         new HtmlWebpackPlugin({ 

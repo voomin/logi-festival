@@ -107,6 +107,13 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 }
                 const game = gameDoc.data();
                 const user = userDoc.data();
+
+                if (user.point < point) {
+                    throw new Error('포인트가 부족합니다.');
+                }
+                
+                user.point -= point;
+
                 const log = {
                     id: logId,
                     selecOption,
@@ -119,12 +126,6 @@ exports.betting = seoul.https.onRequest((req, res) => {
                     uid,
                     createdAt: new Date(),
                 };
-
-                if (user.point < point) {
-                    throw new Error('포인트가 부족합니다.');
-                }
-                
-                user.point -= point;
 
                 await transaction.update(userRef, user);
                 await transaction.set(logInMemberRef, log);
