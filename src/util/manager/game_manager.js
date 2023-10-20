@@ -1,4 +1,4 @@
-import { collection, getDoc, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/firestore";
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
 import GameModel from "../model/game_model";
@@ -35,17 +35,49 @@ export default class GameManager{
 
     }
 
+    static async teamAdd(title) {
+        await GameManager.add(
+            GameModel.createByNameAndOptions(title, [
+                '청팀', '백팀'
+            ]),
+        );
+    }
+
+    static async logibrosAdd(title) {
+        await GameManager.add(
+            GameModel.createByNameAndOptions(title, [
+                "노상민",
+                "최성환",
+                "김효상",
+                "김형기",
+                "심지훈",
+                "김부민",
+                "최수연",
+                "서반석",
+                "정호룡",
+                "임종현",
+                "박새롬",
+                "신병우",
+                "이주혁",
+                "서유리",
+                "이미르",
+                "김상현",
+                "박수정",
+                "조혜선",
+            ]),
+        );
+    }
+
     static async add(game) {
-        const gameModel = new GameModel(game);
         try {
-            const docRef = await addDoc(collection(FirebaseManager.db, "games"), gameModel);
+            const json = GameModel.toJson(game);
+            await setDoc(doc(FirebaseManager.db, "games", game.id), json);
             console.log('게임 생성에 성공했습니다.');
         } catch(err) {
             console.error(err);
             alert('게임 생성에 실패했습니다.');
         } finally {
         }
-        return docRef.id;
     }
 
     static async getLogsById(id) {

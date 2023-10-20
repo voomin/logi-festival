@@ -6,6 +6,12 @@ const { default: MemberManager } = require("./util/manager/member_manager")
 window.bm = {
     auth: Auth.getInstance(),
 
+    class: {
+        Auth,
+        GameManager,
+        MemberManager,
+    },
+
     memberManager: MemberManager.getInstance(),
     gameManager: GameManager.getInstance(),
 }

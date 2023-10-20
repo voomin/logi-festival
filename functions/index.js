@@ -129,7 +129,6 @@ exports.betting = seoul.https.onRequest((req, res) => {
                     id: logId,
                     selecOption,
                     bettingPoint: point,
-                    bettingRate: game.bettingRate,
                     gameName: game.name,
                     userName: user.name,
                     userPoint: user.point,
