@@ -119,6 +119,10 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 const game = gameDoc.data();
                 const user = userDoc.data();
 
+                if (!game.isOnBetting) {
+                    throw new Error('배팅이 중지된 게임입니다.');
+                }
+
                 if (user.point < point) {
                     throw new Error('포인트가 부족합니다.');
                 }

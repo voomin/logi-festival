@@ -24,7 +24,8 @@ export default class GameManager{
         
         await onSnapshot(collection(FirebaseManager.db, "games"), (querySnapshot) => {
             const games = querySnapshot.docs
-                .map(doc => doc.data());
+                .map(doc => doc.data())
+                .sort((a, b) => b.createdAt - a.createdAt);
 
             console.log({
                 games,
@@ -72,7 +73,7 @@ export default class GameManager{
         try {
             const json = GameModel.toJson(game);
             await setDoc(doc(FirebaseManager.db, "games", game.id), json);
-            console.log('게임 생성에 성공했습니다.');
+            alert('게임 생성에 성공했습니다.');
         } catch(err) {
             console.error(err);
             alert('게임 생성에 실패했습니다.');
