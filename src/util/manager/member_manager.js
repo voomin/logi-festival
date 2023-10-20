@@ -34,12 +34,15 @@ export default class MemberManager {
                 .sort((a, b) => b.point - a.point);
 
             this.children = members;
-            const uid = Auth.getInstance().uid;
-            if (!uid) return;
-            const me = members.find(member => member.uid === uid);
-            this.setMe(me);
-            MemberManager.meInHtml(me);
             MemberManager.setListInHtml(members);
+
+            const uid = Auth.getInstance().uid;
+            if (uid) {
+                const me = members.find(member => member.uid === uid);
+                this.setMe(me);
+                MemberManager.meInHtml(me);
+                MemberManager.setPointInHtml(me.point);
+            }
             console.log('watchCollection', {
                 members,
             });
@@ -65,6 +68,8 @@ export default class MemberManager {
 
     static setPointInHtml(point) {
         const myPoint = document.getElementById('myPoint');
+        const memberPoint = document.getElementById('memberPoint');
+        memberPoint.innerText = point;
         myPoint.innerText = point;
     }
 
@@ -166,6 +171,8 @@ export default class MemberManager {
             logDoc.classList.add('d-flex');
             logDoc.classList.add('justify-content-between');
             logDoc.classList.add('align-items-center');
+            // id 부여
+            logDoc.id = log.id;
 
             const textGroup = document.createElement('div');
             textGroup.classList.add('text-start');
@@ -208,6 +215,9 @@ export default class MemberManager {
                 }
                 spiner.style.display = 'none';
                 cancelBettingButton.style.display = 'inline-block';
+
+                const logDoc = document.getElementById(log.id);
+                logDoc.remove();
             }
             // 본인만 취소할 수 있도록
             if (Auth.getInstance().uid !== log.uid) {
