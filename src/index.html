@@ -135,6 +135,14 @@
     <section class="my-3">
         <div class="container px-4 px-lg-5">
             <h5>운동</h5>
+            <!-- 운동 추가하기 버튼 -->
+            <div class="my-3">
+                <button 
+                    id="gameCreateButton"
+                    type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#gameCreateModal">
+                    운동 추가하기
+                </button>
+            </div>
             <div id="gameListBox">
                 <ul class="list-group">
                 </ul>
@@ -239,7 +247,48 @@
         </div>
         </div>
     </div>
+
+    <!-- 게임 생성 모달 -->
+    <div class="modal fade" id="gameCreateModal" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="gameCreateModalLabel">운동 생성하기</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="gameTitleInput1" class="form-label">제목</label>
+                    <input type="email" class="form-control" id="gameTitleInput1" placeholder="">
+                    
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="gameType" id="gameRadioDefault1" checked>
+                    <label class="form-check-label" for="gameRadioDefault1">
+                      팀전
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gameType" id="gameRadioDefault2">
+                    <label class="form-check-label" for="gameRadioDefault2">
+                      개인전
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" id="gameCreateSubmitButton" onclick="gameAdd()">생성하기</button>
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
+    function gameAdd() {
+        const title = document.getElementById('gameTitleInput1').value;
+        const gameType = document.querySelector('input[name="gameType"]:checked').value;
+        alert(`title : ${title}, gameType : ${gameType}`);
+    }
 </script>

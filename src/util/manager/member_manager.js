@@ -141,8 +141,8 @@ export default class MemberManager {
     }
 
     static async setDetailModalInHtml(member) {
-        memberEmail.innerText = `이메일 : ${member.email}`;
-        memberPoint.innerText = `포인트 : ${member.point}`;
+        memberEmail.innerText = `${member.email}`;
+        memberPoint.innerText = `${member.point}`;
 
         const logs = await MemberManager.getLogsByUid(member.uid);
         console.log({

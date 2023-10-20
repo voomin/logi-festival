@@ -1,6 +1,7 @@
 import { collection, getDoc, getDocs, onSnapshot } from "firebase/firestore";
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
+import GameModel from "../model/game_model";
 
 export default class GameManager{
     static instance = null;
@@ -34,6 +35,19 @@ export default class GameManager{
 
     }
 
+    static async add(game) {
+        const gameModel = new GameModel(game);
+        try {
+            const docRef = await addDoc(collection(FirebaseManager.db, "games"), gameModel);
+            console.log('게임 생성에 성공했습니다.');
+        } catch(err) {
+            console.error(err);
+            alert('게임 생성에 실패했습니다.');
+        } finally {
+        }
+        return docRef.id;
+    }
+
     static async getLogsById(id) {
         const logInGameQuerySnapshot = await getDocs(collection(FirebaseManager.db, "games", id, "members"));
         return logInGameQuerySnapshot.docs
@@ -42,7 +56,6 @@ export default class GameManager{
     }
 
     static setListInHtml(games) {
-        
         const gameListBox = document.getElementById('gameListBox');
         const ul = gameListBox.querySelector('ul');
         ul.innerHTML = '';
