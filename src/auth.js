@@ -1,6 +1,7 @@
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import FirebaseManager from "./util/manager/firebase_manager";
 import MemberManager from "./util/manager/member_manager";
+import GameManager from "./util/manager/game_manager";
 
 export default class Auth {
     static instance = null;
@@ -28,8 +29,10 @@ export default class Auth {
                     MemberManager.meInHtml(me);
                 } else {
                     memberManager.setMeByUid(this.uid);
+                    MemberManager.getInstance().setMeByUid(this.uid);
                     Auth.signInHtml(memberManager.me);
                 }
+                GameManager.setListInHtml(GameManager.getInstance().children);
             } else {
                 this.uid = null;
                 // window.memberInGoogle = null;
@@ -65,12 +68,19 @@ export default class Auth {
 
     logout() {
         signOut(FirebaseManager.auth).then(() => {
+            MemberManager.getInstance().out();
             // Sign-out successful.
             document.getElementById('memberBox1').style.display = 'none';
             // document.getElementById('memberBox2').style.display = 'none';
             const guestBox = document.getElementById('guestBox');
             guestBox.style.display = 'block';
+
+            const loginButton = document.getElementById('loginButton');
+            loginButton.disabled = false;
+            loginButton.innerText = '로그인';
+            GameManager.setListInHtml(GameManager.getInstance().children);
         }).catch((error) => {
+            console.error(error);
             // An error happened.
             alert('로그아웃에 실패했습니다.');
         });

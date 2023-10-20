@@ -3,6 +3,7 @@ import Auth from "../../auth";
 import MemberModel from "../model/member_model";
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
+import GameManager from "./game_manager";
 
 export default class MemberManager {
     static instance = null;
@@ -46,6 +47,7 @@ export default class MemberManager {
                 this.setMe(me);
                 MemberManager.meInHtml(me);
                 MemberManager.setPointInHtml(me.point);
+                GameManager.setListInHtml(GameManager.getInstance().children);
             }
             console.log('watchCollection', {
                 members,
@@ -56,6 +58,11 @@ export default class MemberManager {
     setMeByUid(uid) {
         const me = this.children.find(member => member.uid === uid);
         if (me) this.setMe(me);
+    }
+
+
+    out() {
+        this.me = null;
     }
 
     setMe(member) {
@@ -172,6 +179,7 @@ export default class MemberManager {
             memberDetailModalBody.appendChild(logDoc);
         }
         
+        const games = GameManager.getInstance().children;
         const logsDoc = document.createElement('ul');
         logsDoc.classList.add('list-group');
         memberDetailModalBody.appendChild(logsDoc);
@@ -237,6 +245,11 @@ export default class MemberManager {
             }
             // 본인만 취소할 수 있도록
             if (Auth.getInstance().uid !== log.uid || log.receivedPoint) {
+                cancelBettingButton.style.display = 'none';
+            }
+            // 게임이 종료됬거나, 배팅제한인 경우 취소 불가
+            const game = games.find(game => game.id === log.gameId);
+            if (!game.isActivated) {
                 cancelBettingButton.style.display = 'none';
             }
             

@@ -26,7 +26,7 @@ export default class GameManager{
         
         await onSnapshot(collection(FirebaseManager.db, "games"), (querySnapshot) => {
             const games = querySnapshot.docs
-                .map(doc => doc.data())
+                .map(doc => new GameModel(doc.data()))
                 .sort((a, b) => b.createdAt - a.createdAt);
 
             console.log({
@@ -143,7 +143,7 @@ export default class GameManager{
             li.classList.add('align-items-center');
             const name = document.createElement('span');
 
-            if (game.isOnBetting) {
+            if (game.isActivated) {
                 // li.classList.add('list-group-item-success');
             } else {
                 li.classList.add('list-group-item-secondary');
@@ -281,6 +281,13 @@ export default class GameManager{
                 gameDetailModalBody.innerHTML = '';
                 const gameDetailModalLabel = document.getElementById('gameDetailModalLabel');
                 gameDetailModalLabel.innerText = game.name + ' 상세이력';
+
+                const gameDetailAnswer = document.getElementById('gameDetailAnswer');
+                gameDetailAnswer.style.display = 'none';
+                if (game.answer) {
+                    gameDetailAnswer.style.display = 'inline-block';
+                    gameDetailAnswer.innerText = `정답: ${game.answer}`;
+                }
                 
                 if (logs.length === 0) {
                     const logDoc = document.createElement('div');
@@ -308,7 +315,10 @@ export default class GameManager{
             }
             btnGroup.appendChild(detailButton);
 
-            if (game.isOnBetting) {
+            if (
+                game.isActivated
+                && MemberManager.getInstance().me
+            ) {
                 const bettingButton = document.createElement('button');
                 bettingButton.classList.add('btn');
                 bettingButton.classList.add('btn-primary');

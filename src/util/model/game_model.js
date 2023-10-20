@@ -12,6 +12,10 @@ export default class GameModel {
         this.createdAt = createdAt;
     }
 
+    get isActivated() {
+        return this.isOnBetting && this.answer === "";
+    }
+
     static toJson(gameModel) {
         return {
             answer: gameModel.answer,

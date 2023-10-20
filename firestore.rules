@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth.uid != null &&
+        get(/databases/$(database)/documents/members/$(request.auth.uid)).data.isAdmin == true;
+    }
+    function isOwner(uid) {
+      return request.auth.uid != null && request.auth.uid == uid;
+    }
+    match /games/{gameId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /members/{logId} {
+        allow read: if true;
+        allow delete: if isOwner(resource.data.uid);
+        allow create, update: if false;
+      }
+    }
+    match /members/{memberId} {
+      allow read: if true;
+      allow write: if isOwner(memberId);
+      // isAdmin 수정 못하도록
+      allow update: if (!request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['isAdmin']));
+      
+      match /games/{logId} {
+        allow read: if true;
+        allow delete: if isOwner(memberId);
+        allow create, update: if false;
+      }
+    }
+  }
+}
