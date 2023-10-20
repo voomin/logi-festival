@@ -3,6 +3,7 @@ import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
 import GameModel from "../model/game_model";
 import { httpsCallableFromURL } from "firebase/functions";
+import MemberManager from "./member_manager";
 
 export default class GameManager{
     static instance = null;
@@ -108,6 +109,10 @@ export default class GameManager{
     }
 
     static async add(game) {
+        if (MemberManager.getInstance().isAdmin === false) {
+            alert('관리자만 게임을 생성할 수 있습니다.');
+            return;
+        }
         try {
             const json = GameModel.toJson(game);
             await setDoc(doc(FirebaseManager.db, "games", game.id), json);
@@ -252,7 +257,10 @@ export default class GameManager{
                     }
                 }
             };
-            btnGroup.appendChild(adminButton);
+
+            if (MemberManager.getInstance().isAdmin) {
+                btnGroup.appendChild(adminButton);
+            }
 
             const detailButton = document.createElement('button');
             detailButton.classList.add('btn');

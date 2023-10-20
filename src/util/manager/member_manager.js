@@ -16,6 +16,10 @@ export default class MemberManager {
     children = [];
     me = null;
 
+    get isAdmin() {
+        return this.me && this.me.isAdmin;
+    }
+
     _watching = false;
 
     constructor() {
@@ -86,6 +90,11 @@ export default class MemberManager {
         // document.getElementById('memberBox2').style.display = 'block';
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'none';
+
+        if (me.isAdmin) {
+            const gameCreateButton = document.getElementById('gameCreateButton');
+            gameCreateButton.style.display = 'inline-block';
+        }
     }
 
     static setListInHtml(members) {
