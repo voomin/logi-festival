@@ -209,6 +209,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <p id="gameDetailTotalPoint"></p>
                 <div id="gameDetailModalBody">
 
                 </div>
@@ -326,15 +327,16 @@
                 <div id="adminAnswerBox">
 
                 </div>
-
-
-                <!-- spinner -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 <button 
                     id="answerSetButton"
-                    type="button" class="btn btn-primary" onclick="answerSet()" data-bs-dismiss="modal">정답 세팅</button>
+                    type="button" class="btn btn-primary" >정답 세팅</button>
+                <!-- spinner -->
+                <div class="spinner-border text-primary" role="status" id="answerSetButtonSpinner" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
 
             </div>
         </div>

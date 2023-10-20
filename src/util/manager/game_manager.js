@@ -2,6 +2,7 @@ import { collection, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/f
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
 import GameModel from "../model/game_model";
+import { httpsCallableFromURL } from "firebase/functions";
 
 export default class GameManager{
     static instance = null;
@@ -34,6 +35,43 @@ export default class GameManager{
             GameManager.setListInHtml(games);
         });
 
+    }
+
+    static answerSet(id, answer) {
+        return new Promise((resolve, reject) => {
+            const functionName = 'answerSet';
+            const queryParameters = {
+                gameId: id,
+                answer
+            };
+            const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
+            const baseUrl = FirebaseManager.functionsApiUrl;
+            const functionUrl = `${baseUrl}/${functionName}?${queryString}`;
+            
+            httpsCallableFromURL(
+                FirebaseManager.functions, 
+                functionUrl,
+            )()
+                .then((result) => {
+                    // // Read result of the Cloud Function.
+                    // /** @type {any} */
+                    // const data = result.data;
+                    // const sanitizedMessage = data.text;
+                    console.log({
+                        result,
+                    });
+                    resolve(result.data);
+                }).catch(err => {
+                    console.log({
+                        err,
+                        // code,
+                        // message,
+                        // details,
+                    });
+                    resolve(err.data);
+                })
+        });
+        
     }
 
     static async teamAdd(title) {
@@ -98,7 +136,16 @@ export default class GameManager{
             li.classList.add('d-flex');
             li.classList.add('justify-content-between');
             li.classList.add('align-items-center');
-            li.innerText = game.name;
+            const name = document.createElement('span');
+
+            if (game.isOnBetting) {
+                // li.classList.add('list-group-item-success');
+            } else {
+                li.classList.add('list-group-item-secondary');
+                name.classList.add('text-muted');
+            }
+            name.innerText = game.name;
+            li.appendChild(name);
             ul.appendChild(li);
 
             const btnGroup = document.createElement('div');
@@ -118,6 +165,32 @@ export default class GameManager{
             adminButton.onclick = () => {
                 const label = document.getElementById('gameAdminModalLabel');
                 label.innerText = game.name + ' 관리';
+
+                const answerSetButton = document.getElementById('answerSetButton');
+                answerSetButton.onclick = async () => {
+                    if (game.answer) {
+                        alert('이미 정답이 설정되었습니다.');
+                        return;
+                    }
+                    const selectOptionDoc = document.querySelector('input[name="answer"]:checked');
+                    if (!selectOptionDoc) {
+                        alert('정답을 선택해주세요.');
+                        return;
+                    }
+                    const answer = selectOptionDoc.value;
+                    const spiner = document.getElementById('answerSetButtonSpinner');
+                    spiner.style.display = 'inline-block';
+                    answerSetButton.style.display = 'none';
+                    const result = await GameManager.answerSet(game.id, answer) || { isErr: true, message: '응답이 없습니다.' };
+                    if (result.isErr) {
+                        alert('정답 설정에 실패했습니다. ' + result.message);
+                    } else {
+                        alert('정답 설정에 성공했습니다.');
+                    }
+                    spiner.style.display = 'none';
+                    answerSetButton.style.display = 'inline-block';
+
+                };
 
                 const adminAnswerBox = document.getElementById('adminAnswerBox');
                 adminAnswerBox.innerHTML = '';
@@ -191,6 +264,9 @@ export default class GameManager{
                 const spiner = document.getElementById('gameDetailModalSpinner');
                 spiner.style.display = 'inline-block';
 
+                const gameDetailTotalPoint = document.getElementById('gameDetailTotalPoint');
+                gameDetailTotalPoint.innerText = '';
+
                 const logs = await GameManager.getLogsById(game.id);
                 
                 const gameDetailModalBody = document.getElementById('gameDetailModalBody');
@@ -204,6 +280,7 @@ export default class GameManager{
                     logDoc.innerText = '이력이 없습니다.';
                     gameDetailModalBody.appendChild(logDoc);
                 }
+                let totalPoint = 0;
                 const logsDoc = document.createElement('ul');
                 logsDoc.classList.add('list-group');
                 gameDetailModalBody.appendChild(logsDoc);
@@ -212,7 +289,12 @@ export default class GameManager{
                     logDoc.classList.add('list-group-item');
                     logDoc.innerText = `${log.userName}님이 '${log.selecOption}'에 ${log.bettingPoint} 배팅했습니다.`;
                     logsDoc.appendChild(logDoc);
+                    totalPoint += Number(log.bettingPoint);
                 });
+
+                gameDetailTotalPoint.innerText = `총 배팅 포인트: ${totalPoint}`;
+
+                
 
                 spiner.style.display = 'none';
             }

@@ -186,6 +186,7 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
             
             const decodedToken = await admin.auth().verifyIdToken(idToken);
             const uid = decodedToken.uid;
+            
             const userRef = admin.firestore().collection('members').doc(uid);
             const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(logId);
             
@@ -202,16 +203,24 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
                     throw new Error('본인만 취소할 수 있습니다.');
                 }
                 const logInGameRef = admin.firestore().collection('games').doc(log.gameId).collection('members').doc(logId);
-                // const logInGameDoc = await transaction.get(logInGameRef);
-                // if (!logInGameDoc.exists) {
-                //     throw new Error('로그가 존재하지 않습니다.(logInGameDoc)');
-                // }
-                // const game = gameDoc.data();
                 const userDoc = await transaction.get(userRef);
                 if (!userDoc.exists) {
                     throw new Error('유저가 존재하지 않습니다.');
                 }
                 const user = userDoc.data();
+                const gameRef = admin.firestore().collection('games').doc(log.gameId);
+                const gameDoc = await transaction.get(gameRef);
+                if (!gameDoc.exists) {
+                    throw new Error('게임이 존재하지 않습니다.');
+                }
+                const game = gameDoc.data();
+
+                if (game.isOnBetting === false) {
+                    throw new Error('배팅이 중지된 게임이라 취소할 수 없습니다.');
+                }
+                if (game.answer) {
+                    throw new Error('이미 정답이 등록되어 취소할 수 없습니다.');
+                }
                 // const logInMember = logInMemberDoc.data();
                 // const logInGame = logInGameDoc.data();
 
@@ -234,6 +243,132 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
                     myPoint,
                 }
             });
+        } catch(error) {
+            res
+                .json({
+                    data: {
+                        isErr: true,
+                        message: error.message,
+                    }
+                });
+        }
+    });
+});
+
+exports.answerSet = seoul.https.onRequest((req, res) => {
+    cors(req, res, async ()=>{
+        try {
+            const { gameId, answer } = req.query;
+            if (!gameId || !answer) {
+                throw new Error('gameId, answer가 필요합니다.');
+            }
+
+            // 요청에서 사용자 ID 토큰 가져오기
+            let idToken = req.headers.authorization;
+            if (idToken.startsWith('Bearer ')) {
+                // Remove Bearer from string
+                idToken = idToken.slice(7, idToken.length);
+            }
+            
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const uid = decodedToken.uid;
+
+
+            const userRef = admin.firestore().collection('members').doc(uid);
+            const userDoc = await userRef.get();
+
+            if (!userDoc.exists) {
+                throw new Error('유저가 존재하지 않습니다.');
+            }
+            const user = userDoc.data();
+            const isAdmin = user.isAdmin;
+            if (!isAdmin) {
+                throw new Error('관리자만 정답을 등록할 수 있습니다.');
+            }
+
+            const gameRef = admin.firestore().collection('games').doc(gameId);
+            const gameDoc = await gameRef.get();
+            if (!gameDoc.exists) {
+                throw new Error('게임이 존재하지 않습니다.');
+            }
+            const game = gameDoc.data();
+
+            if (game.answer) {
+                throw new Error('이미 정답이 등록되었습니다.');
+            }
+
+
+            const batch = admin.firestore().batch();
+
+
+            const logsInGameRef = admin.firestore().collection('games').doc(gameId).collection('members');
+            const logsInGame = await logsInGameRef.get();
+            if (logsInGame.empty) {
+                throw new Error('배팅한 사람들이 존재하지 않습니다.');
+            }
+            const logs = logsInGame.docs.map(doc => doc.data());
+            const totalBettingPoint = logs.reduce((acc, log) => {
+                const { bettingPoint = 0 } = log;
+                acc += Number(bettingPoint);
+                return acc;
+            }, 0);
+
+            const logsOfAnswerMember = logs.filter(log => log.selecOption === answer);
+            const totalBettingPointOfAnswerMember = logsOfAnswerMember.reduce((acc, log) => {
+                const { bettingPoint = 0 } = log;
+                acc += Number(bettingPoint);
+                return acc;
+            }, 0);
+
+            const logId = uuidv4();
+
+            // logsOfAnswerMember.forEach(async (log) => {
+            for (const log of logsOfAnswerMember) {
+                const memberRef = admin.firestore().collection('members').doc(log.uid);
+                const logsInMemberRef = admin.firestore().collection('members').doc(log.uid).collection('games').doc(logId);
+                const receivedPoint = Math.floor(log.bettingPoint * totalBettingPoint / totalBettingPointOfAnswerMember);
+                
+                const memberDoc = await memberRef.get();
+                if (!memberDoc.exists) {
+                    throw new Error('유저가 존재하지 않습니다.');
+                }
+                const member = memberDoc.data();
+                const point = member.point;
+
+                batch.update(memberRef, {
+                    point: point + receivedPoint,
+                });
+
+                const receivedLog = {
+                    id: logId,
+                    receivedPoint,
+                    selecOption: log.selecOption,
+                    bettingPoint: log.bettingPoint,
+                    gameName: log.gameName,
+                    userName: log.userName,
+                    userPoint: log.userPoint + receivedPoint,
+                    gameId: log.gameId,
+                    uid: log.uid,
+                    createdAt: new Date(),
+                };
+
+                batch.set(logsInMemberRef, receivedLog);
+            };
+
+            batch.update(gameRef, {
+                answer,
+                isOnBetting: false,
+            });
+
+            await batch.commit();
+
+
+            res.json({
+                data: {
+                    answer,
+                }
+            });
+
         } catch(error) {
             res
                 .json({

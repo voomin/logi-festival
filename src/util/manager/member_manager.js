@@ -182,7 +182,13 @@ export default class MemberManager {
 
             const mainText = document.createElement('p');
             mainText.classList.add('mb-1');
-            mainText.innerText = log.gameName + '에 ' + log.selecOption + '(으)로 ' + log.bettingPoint + ' 배팅했습니다.';
+
+            if (log.receivedPoint) {
+                mainText.innerText = `${log.gameName}에서 ${log.selecOption}(으)로 ${log.bettingPoint} 배팅하여 ${log.receivedPoint} 포인트를 받았습니다.`;
+                logDoc.classList.add('list-group-item-success');
+            } else {
+                mainText.innerText = log.gameName + '에 ' + log.selecOption + '(으)로 ' + log.bettingPoint + ' 배팅했습니다.';
+            }
             textGroup.appendChild(mainText);
 
             const subText1 = document.createElement('small');
@@ -214,16 +220,14 @@ export default class MemberManager {
                     alert('취소에 실패했습니다. ' + data.message);
                 } else {
                     alert('정상적으로 취소되었습니다.');
+                    const logDoc = document.getElementById(log.id);
+                    logDoc.remove();
                 }
                 spiner.style.display = 'none';
                 cancelBettingButton.style.display = 'inline-block';
-
-                const logDoc = document.getElementById(log.id);
-                logDoc.remove();
             }
             // 본인만 취소할 수 있도록
-            if (Auth.getInstance().uid !== log.uid) {
-                // 숨기기
+            if (Auth.getInstance().uid !== log.uid || log.receivedPoint) {
                 cancelBettingButton.style.display = 'none';
             }
             
