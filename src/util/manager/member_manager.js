@@ -93,7 +93,22 @@ export default class MemberManager {
             li.classList.add('d-flex');
             li.classList.add('justify-content-between');
             li.classList.add('align-items-center');
-            li.innerText = `${index+1}. ${member.name} (${member.point})`;
+
+            const textGroup = document.createElement('div');
+            textGroup.classList.add('text-start');
+            li.appendChild(textGroup);
+
+            const mainText = document.createElement('p');
+            mainText.classList.add('mb-1');
+            mainText.innerText = `${index+1}. ${member.name} - ${member.point}p`;
+
+            const subText = document.createElement('small');
+            subText.classList.add('text-muted');
+            subText.innerText = member.email;
+            textGroup.appendChild(mainText);
+            textGroup.appendChild(subText);
+
+
 
             const btnGroup = document.createElement('div');
             btnGroup.classList.add('btn-group');
@@ -121,6 +136,7 @@ export default class MemberManager {
     }
 
     static async setDetailModalInHtml(member) {
+        memberEmail.innerText = `이메일 : ${member.email}`;
         memberPoint.innerText = `포인트 : ${member.point}`;
 
         const logs = await MemberManager.getLogsByUid(member.uid);
@@ -144,23 +160,61 @@ export default class MemberManager {
         logsDoc.classList.add('list-group');
         memberDetailModalBody.appendChild(logsDoc);
         logs.forEach((log) => {
+            // list tile
             const logDoc = document.createElement('div');
             logDoc.classList.add('list-group-item');
-            logDoc.innerText = `${log.gameName}에 '${log.selecOption}'(으)로 ${log.bettingPoint} 배팅했습니다. (남은 포인트 : ${log.userPoint}))`;
+            logDoc.classList.add('d-flex');
+            logDoc.classList.add('justify-content-between');
+            logDoc.classList.add('align-items-center');
+
+            const textGroup = document.createElement('div');
+            textGroup.classList.add('text-start');
+            logDoc.appendChild(textGroup);
+
+            const mainText = document.createElement('p');
+            mainText.classList.add('mb-1');
+            mainText.innerText = log.gameName + '에 ' + log.selecOption + '(으)로 ' + log.bettingPoint + ' 배팅했습니다.';
+            textGroup.appendChild(mainText);
+
+            const subText1 = document.createElement('small');
+            subText1.innerText = '남은 포인트 : ' + log.userPoint;
+            // const subText2 = document.createElement('small');
+            // subText2.innerText = new Date(log.createdAt).toLocaleString();
+            textGroup.appendChild(subText1);
+            // textGroup.appendChild(subText2);
+
+            const spiner = document.createElement('span');
+            spiner.classList.add('spinner-border');
+            spiner.classList.add('spinner-border-sm');
+            spiner.setAttribute('role', 'status');
+            spiner.setAttribute('aria-hidden', 'true');
+            spiner.style.display = 'none';
+            logDoc.appendChild(spiner);
 
             const cancelBettingButton = document.createElement('button');
             cancelBettingButton.classList.add('btn');
             cancelBettingButton.classList.add('btn-sm');
-            cancelBettingButton.classList.add('btn-outline-secondary');
-            cancelBettingButton.innerText = 'x';
+            cancelBettingButton.classList.add('btn-outline-danger');
+            cancelBettingButton.innerText = '취소';
             cancelBettingButton.onclick = async () => {
+                spiner.style.display = 'inline-block';
+                cancelBettingButton.style.display = 'none';
+
                 const data = await BettingManager.cancel(log.id);
                 if (data.isErr) {
                     alert('취소에 실패했습니다. ' + data.message);
                 } else {
                     alert('정상적으로 취소되었습니다.');
                 }
+                spiner.style.display = 'none';
+                cancelBettingButton.style.display = 'inline-block';
             }
+            // 본인만 취소할 수 있도록
+            if (Auth.getInstance().uid !== log.uid) {
+                // 숨기기
+                cancelBettingButton.style.display = 'none';
+            }
+            
             logDoc.appendChild(cancelBettingButton);
             logsDoc.appendChild(logDoc);
         });

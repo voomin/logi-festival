@@ -111,7 +111,13 @@
                     <h1 class="mx-auto my-0 text-uppercase">로지 운동회</h1>
                     <!-- <h2 class="text-black-50 mx-auto mt-2 mb-5">Welcome 입니다~ 🤗</h2> -->
                     <div class="mx-auto mt-5">
-                        <button class="btn btn-primary" onclick="window.bm.auth.showPopup()">로그인</button>
+                        <button 
+                        id="loginButton"
+                        class="btn btn-primary" onclick="window.bm.auth.showPopup()">로그인</button>
+                        <!-- spinner -->
+                        <div class="spinner-border text-primary" role="status" id="loginSpinner" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
                     </div>
                 </div>
             </div>
@@ -215,6 +221,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <p id="memberEmail"></p>
                 <p id="memberPoint"></p>
                 <div id="memberDetailModalBody">
                     <div class="spinner-border" role="status" >

@@ -25,6 +25,7 @@ export default class Auth {
                 const me = memberManager.me;
                 if (me) {
                     Auth.signInHtml(me);
+                    MemberManager.meInHtml(me);
                 } else {
                     memberManager.setMeByUid(this.uid);
                     Auth.signInHtml(memberManager.me);
@@ -40,12 +41,25 @@ export default class Auth {
     }
 
     showPopup() {
+        const loginButton = document.getElementById('loginButton');
+        loginButton.style.display = 'none';
+    
+        const loginSpinner = document.getElementById('loginSpinner');
+        loginSpinner.style.display = 'inline-block';
+
         signInWithPopup(
             FirebaseManager.auth, 
             FirebaseManager.provider
-        ).catch((error) => {
+        ).then((result) => {
+            loginButton.style.display = 'inline-block'
+            loginButton.disabled = true;
+            loginButton.innerText = '유저 정보를 생성중입니다...';
+        }).catch((error) => {
             console.error(error);
-            new Error('[showPopup] 로그인 팝업 뛰우는데 실패했습니다.');
+            alert('[showPopup] 로그인 팝업 뛰우는데 실패했습니다.');
+            loginButton.style.display = 'inline-block'
+        }).finally(() => {
+            loginSpinner.style.display = 'none';;
         });
     }
 

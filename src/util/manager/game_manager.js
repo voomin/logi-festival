@@ -42,6 +42,7 @@ export default class GameManager{
     }
 
     static setListInHtml(games) {
+        
         const gameListBox = document.getElementById('gameListBox');
         const ul = gameListBox.querySelector('ul');
         ul.innerHTML = '';

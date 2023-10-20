@@ -25,7 +25,7 @@ export default class BettingManager {
             };
             const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
             // const baseUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
-            const baseUrl = 'http://localhost:5001/logifestival/asia-northeast3/betting';
+            const baseUrl = FirebaseManager.functionsApiUrl;
             const functionUrl = `${baseUrl}/${functionName}?${queryString}`;
             
             httpsCallableFromURL(
@@ -61,7 +61,7 @@ export default class BettingManager {
             };
             const queryString = Object.keys(queryParameters).map(key => `${key}=${queryParameters[key]}`).join('&');
             // const baseUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
-            const baseUrl = 'http://localhost:5001/logifestival/asia-northeast3/cancelBet';
+            const baseUrl = FirebaseManager.functionsApiUrl;
             const functionUrl = `${baseUrl}/${functionName}?${queryString}`;
     
             httpsCallableFromURL(
@@ -138,16 +138,20 @@ export default class BettingManager {
             spinner.style.display = 'inline-block';
             submitButton.style.display = 'none';
 
-            const data = await BettingManager.go(
-                game.id,
-                selectOption, 
-                pointInput.value,
-            );
-            if (data.isErr) {
-                alert('배팅에 실패했습니다. ' + data.message);
-            } else {
-                MemberManager.setPointInHtml(data.myPoint);
-                alert('정상적으로 배팅 완료되었습니다.')
+            try {
+                const data = await BettingManager.go(
+                    game.id,
+                    selectOption, 
+                    pointInput.value,
+                );
+                if (data.isErr) {
+                    alert('배팅에 실패했습니다. ' + data.message);
+                } else {
+                    MemberManager.setPointInHtml(data.myPoint);
+                    alert('정상적으로 배팅 완료되었습니다.')
+                }
+            } catch(err) {
+                alert('서버에 문제가 생겼습니다. [setModalInHtml] ' + err.message);
             }
 
             spinner.style.display = 'none';

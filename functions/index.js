@@ -60,6 +60,17 @@ exports.welcomeLogibros = seoul.auth.user().onCreate((user) => {
   } 
 });
 
+exports.goodbyeLogibros = seoul.auth.user().onDelete((user) => {
+    try {
+        const { uid } = user;
+    
+        const userRef = admin.firestore().collection('members').doc(uid);
+        userRef.delete();
+    } catch(error) {
+        console.error(error);
+    } 
+});
+
 exports.betting = seoul.https.onRequest((req, res) => {
     let logs = [];
     cors(req, res, async ()=>{
@@ -183,6 +194,10 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
                     throw new Error('로그가 존재하지 않습니다.(logInMemberDoc)');
                 }
                 const log = logInMemberDoc.data();
+
+                if (log.uid !== uid) {
+                    throw new Error('본인만 취소할 수 있습니다.');
+                }
                 const logInGameRef = admin.firestore().collection('games').doc(log.gameId).collection('members').doc(logId);
                 // const logInGameDoc = await transaction.get(logInGameRef);
                 // if (!logInGameDoc.exists) {
