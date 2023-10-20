@@ -114,6 +114,9 @@ export default class GameManager{
             detailButton.setAttribute('data-bs-target', '#gameDetailModal');
             detailButton.innerText = '이력보기';
             detailButton.onclick = async () => {
+                const spiner = document.getElementById('gameDetailModalSpinner');
+                spiner.style.display = 'inline-block';
+
                 const logs = await GameManager.getLogsById(game.id);
                 
                 const gameDetailModalBody = document.getElementById('gameDetailModalBody');
@@ -136,6 +139,8 @@ export default class GameManager{
                     logDoc.innerText = `${log.userName}님이 '${log.selecOption}'에 ${log.bettingPoint} 배팅했습니다.`;
                     logsDoc.appendChild(logDoc);
                 });
+
+                spiner.style.display = 'none';
             }
             btnGroup.appendChild(detailButton);
 

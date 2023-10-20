@@ -144,6 +144,8 @@ export default class MemberManager {
         memberEmail.innerText = `${member.email}`;
         memberPoint.innerText = `${member.point}`;
 
+        const spiner = document.getElementById('memberDetailModalSpinner');
+        spiner.style.display = 'inline-block';
         const logs = await MemberManager.getLogsByUid(member.uid);
         console.log({
             logs
@@ -228,5 +230,7 @@ export default class MemberManager {
             logDoc.appendChild(cancelBettingButton);
             logsDoc.appendChild(logDoc);
         });
+
+        spiner.style.display = 'none';
     }
 }
