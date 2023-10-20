@@ -107,6 +107,79 @@ export default class GameManager{
             btnGroup.setAttribute('aria-label', 'Basic example');   
             li.appendChild(btnGroup);
 
+            const adminButton = document.createElement('button');
+            // gameAdminModal 열기
+            adminButton.classList.add('btn');
+            adminButton.classList.add('btn-warning');
+            adminButton.setAttribute('data-bs-toggle', 'modal');
+            adminButton.setAttribute('data-bs-target', '#gameAdminModal');
+            adminButton.innerText = '관리';
+            adminButton.onclick = () => {
+                const label = document.getElementById('gameAdminModalLabel');
+                label.innerText = game.name + ' 관리';
+
+                const adminAnswerBox = document.getElementById('adminAnswerBox');
+                adminAnswerBox.innerHTML = '';
+                game.options.forEach((option) => {
+                    const formCheck = document.createElement('div');
+                    formCheck.classList.add('form-check');
+                    const formCheckInput = document.createElement('input');
+                    formCheckInput.classList.add('form-check-input');
+                    formCheckInput.type = 'radio';
+                    formCheckInput.name = 'answer';
+                    formCheckInput.value = option;
+                    formCheckInput.id = option;
+                    formCheck.appendChild(formCheckInput);
+                    const formCheckLabel = document.createElement('label');
+                    formCheckLabel.classList.add('form-check-label');
+                    formCheckLabel.setAttribute('for', option);
+                    formCheckLabel.innerText = option;
+                    formCheck.appendChild(formCheckLabel);
+                    adminAnswerBox.appendChild(formCheck);
+                });
+                
+
+                const unlockButton = document.getElementById('bettingUnlockButton');
+                const lockButton = document.getElementById('bettingLockButton');
+                unlockButton.style.display = 'inline-block';
+                lockButton.style.display = 'inline-block';
+
+                if (game.isOnBetting) {
+                    unlockButton.style.display = 'none';
+                } else {
+                    lockButton.style.display = 'none';
+                }
+
+                lockButton.onclick = async () => {
+                    const spinner = document.getElementById('bettinglockButtonSpinner');
+                    spinner.style.display = 'inline-block';
+                    lockButton.style.display = 'none';
+                    const isSuccess = await BettingManager.updateIsOnBettingById(game.id, false);
+                    spinner.style.display = 'none';
+                    if (isSuccess) {
+                        game.isOnBetting = false;
+                        unlockButton.style.display = 'inline-block';
+                    } else {
+                        lockButton.style.display = 'inline-block';
+                    }
+                };
+
+                unlockButton.onclick = async () => {
+                    const spinner = document.getElementById('bettinglockButtonSpinner');
+                    spinner.style.display = 'inline-block';
+                    unlockButton.style.display = 'none';
+                    const isSuccess = await BettingManager.updateIsOnBettingById(game.id, true);
+                    spinner.style.display = 'none';
+                    if (isSuccess) {
+                        game.isOnBetting = true;
+                        lockButton.style.display = 'inline-block';
+                    } else {
+                        unlockButton.style.display = 'inline-block';
+                    }
+                }
+            };
+            btnGroup.appendChild(adminButton);
+
             const detailButton = document.createElement('button');
             detailButton.classList.add('btn');
             detailButton.classList.add('btn-info');
@@ -144,18 +217,20 @@ export default class GameManager{
             }
             btnGroup.appendChild(detailButton);
 
-            const bettingButton = document.createElement('button');
-            bettingButton.classList.add('btn');
-            bettingButton.classList.add('btn-primary');
-            // class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal"
-            bettingButton.setAttribute('data-bs-toggle', 'modal');
-            bettingButton.setAttribute('data-bs-target', '#bettingModal');
+            if (game.isOnBetting) {
+                const bettingButton = document.createElement('button');
+                bettingButton.classList.add('btn');
+                bettingButton.classList.add('btn-primary');
+                // class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal"
+                bettingButton.setAttribute('data-bs-toggle', 'modal');
+                bettingButton.setAttribute('data-bs-target', '#bettingModal');
 
-            bettingButton.innerText = '배팅하기';
-            bettingButton.onclick = () => {
-                BettingManager.setModalInHtml(game);
+                bettingButton.innerText = '배팅하기';
+                bettingButton.onclick = () => {
+                    BettingManager.setModalInHtml(game);
+                }
+                btnGroup.appendChild(bettingButton);
             }
-            btnGroup.appendChild(bettingButton);
         });
     }
 }

@@ -1,6 +1,7 @@
 import { httpsCallableFromURL } from "firebase/functions";
 import MemberManager from "./member_manager";
 import FirebaseManager from "./firebase_manager";
+import { doc, updateDoc } from "firebase/firestore";
 
 export default class BettingManager {
     static instance = null;
@@ -87,6 +88,27 @@ export default class BettingManager {
                     resolve(err.data);
                 })
         });
+    }
+
+    static async updateIsOnBettingById(id, bool) {
+        try {
+            const gameRef = await doc(FirebaseManager.db, "games", id);
+            await updateDoc(gameRef, {
+                isOnBetting: bool,
+            });
+
+            if (bool) {
+                alert('배팅을 허용 시켰습니다.');
+            } else {
+                alert('배팅을 중지 시켰습니다.');
+            }
+            return true;
+        } catch(err) {
+            console.error(err);
+            alert('배팅제한 값 업데이트 하는데 실패했습니다.');
+            return false;
+        }
+
     }
 
     static async setModalInHtml(game) {

@@ -294,6 +294,52 @@
         </div>
         </div>
     </div>
+
+    <!-- 게임 admin 모달 -->
+    <div class="modal fade" id="gameAdminModal" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="gameAdminModalLabel">Admin</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 배팅 lock 버튼-->
+                <div class="mb-3">
+                    <button 
+                        id="bettingLockButton"
+                        type="button" class="btn btn-warning w-100">배팅 못하게 하기</button>
+                    <div class="spinner-border text-primary" role="status" id="bettinglockButtonSpinner" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                        </div>
+                </div>
+
+                <!-- 배팅 lock 해제 -->
+                <div class="mb-3">
+                    <button 
+                        id="bettingUnlockButton"
+                        type="button" class="btn btn-outline-warning w-100" >배팅 할 수 있도록 하기</button>
+                </div>
+
+                <!-- 정답 세팅 -->
+                <p>정답을 선택해주세요.</p>
+                <div id="adminAnswerBox">
+
+                </div>
+
+
+                <!-- spinner -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button 
+                    id="answerSetButton"
+                    type="button" class="btn btn-primary" onclick="answerSet()" data-bs-dismiss="modal">정답 세팅</button>
+
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
