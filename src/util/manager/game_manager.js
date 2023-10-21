@@ -133,6 +133,8 @@ export default class GameManager{
 
     static setListInHtml(games) {
         const gameListBox = document.getElementById('gameListBox');
+        const gameListEmpty = document.getElementById('gameListEmpty');
+        gameListEmpty.style.display = 'none';
         const ul = gameListBox.querySelector('ul');
         ul.innerHTML = '';
         games.forEach((game) => {
@@ -146,8 +148,10 @@ export default class GameManager{
             if (game.isActivated) {
                 // li.classList.add('list-group-item-success');
             } else {
+                li.classList.add('game-not-activated');
                 li.classList.add('list-group-item-secondary');
                 name.classList.add('text-muted');
+
             }
             name.innerText = game.name;
             li.appendChild(name);
@@ -332,6 +336,44 @@ export default class GameManager{
                 }
                 btnGroup.appendChild(bettingButton);
             }
+        });
+
+        // 보여줄 게임이 없으면
+        if (games.filter((game) => game.isActivated).length === 0) {
+            gameListEmpty.style.display = 'block';
+        }
+
+        // game-not-activated 가리기
+        const gameNotActivated = document.querySelectorAll('.game-not-activated');
+        console.log({
+            gameNotActivated,
+        });
+        gameNotActivated.forEach((game) => {
+            game.classList.add('d-none');
+        });
+
+    }
+
+    static allView() {
+        const gameSimpleViewButton = document.getElementById('gameSimpleViewButton');
+        const gameAllViewButton = document.getElementById('gameAllViewButton');
+        gameSimpleViewButton.style.display = 'inline-block';
+        gameAllViewButton.style.display = 'none';
+        const gameNotActivated = document.querySelectorAll('.game-not-activated');
+        gameNotActivated.forEach((game) => {
+            game.classList.remove('d-none');
+        });
+    }
+
+    static onlyActivatedView() {
+        const gameSimpleViewButton = document.getElementById('gameSimpleViewButton');
+        const gameAllViewButton = document.getElementById('gameAllViewButton');
+        gameSimpleViewButton.style.display = 'none';
+        gameAllViewButton.style.display = 'inline-block';
+
+        const gameNotActivated = document.querySelectorAll('.game-not-activated');
+        gameNotActivated.forEach((game) => {
+            game.classList.add('d-none');
         });
     }
 }

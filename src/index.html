@@ -148,6 +148,27 @@
                 <ul class="list-group">
                 </ul>
             </div>
+            <p id="gameListEmpty" class="text-center" style="display: none;">
+                대기중인 운동이 없습니다.
+            </p>
+            <div class="text-end">
+                <!-- 모두보기 text버튼 -->
+                <button 
+                    id="gameAllViewButton"
+                    type="button" class="btn btn-link" 
+                    onclick="window.bm.class.GameManager.allView()">
+                    모두보기
+                </button>
+                <!-- 간략히 -->
+                <button 
+                    id="gameSimpleViewButton"
+                    style="display: none;"
+                    type="button" class="btn btn-link" 
+                    onclick="window.bm.class.GameManager.onlyActivatedView()">
+                    간략히
+                </button>
+            </div>
+
         </div>
     </section>
 
