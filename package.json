@@ -5,6 +5,7 @@
   "main": "key.js",
   "scripts": {
     "serve": "yarn webpack serve",
+    "build": "yarn webpack build --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
