@@ -283,7 +283,10 @@ export default class MemberManager {
             const mainText = document.createElement('p');
             mainText.classList.add('mb-1');
 
-            if (log.receivedPoint) {
+            if (log.teamPoint) {
+                mainText.innerText = `${log.gameName}에서 팀의 승리로 ${log.receivedPoint} 포인트를 받았습니다.`;
+                logDoc.classList.add('list-group-item-primary');
+            } else if (log.receivedPoint) {
                 mainText.innerText = `${log.gameName}에서 ${log.selecOption}(으)로 ${log.bettingPoint} 배팅하여 ${log.receivedPoint} 포인트를 받았습니다.`;
                 logDoc.classList.add('list-group-item-success');
             } else {

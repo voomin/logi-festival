@@ -21,6 +21,6 @@ export default class FirebaseManager {
     static functions = functions;
     static provider = provider;
 
-    // static functionsApiUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
-    static functionsApiUrl = 'http://localhost:5001/logifestival/asia-northeast3';
+    static functionsApiUrl = 'https://asia-northeast3-logifestival.cloudfunctions.net';
+    // static functionsApiUrl = 'http://localhost:5001/logifestival/asia-northeast3';
 }
