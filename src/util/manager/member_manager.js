@@ -44,10 +44,12 @@ export default class MemberManager {
             const uid = Auth.getInstance().uid;
             if (uid) {
                 const me = members.find(member => member.uid === uid);
-                this.setMe(me);
-                MemberManager.meInHtml(me);
-                MemberManager.setPointInHtml(me.point);
-                GameManager.setListInHtml(GameManager.getInstance().children);
+                if (me) {
+                    this.setMe(me);
+                    MemberManager.meInHtml(me);
+                    MemberManager.setPointInHtml(me.point);
+                    GameManager.setListInHtml(GameManager.getInstance().children);
+                }
             }
             console.log('watchCollection', {
                 members,
@@ -115,19 +117,44 @@ export default class MemberManager {
             li.classList.add('justify-content-between');
             li.classList.add('align-items-center');
 
+
             const textGroup = document.createElement('div');
             textGroup.classList.add('text-start');
+            textGroup.classList.add('d-flex');
+            textGroup.classList.add('align-items-center');
+
+
             li.appendChild(textGroup);
+            
+            const number = document.createElement('span');
+            number.classList.add('badge');
+            number.classList.add('bg-primary');
+            number.classList.add('rounded-pill');
+            number.classList.add('me-2');
+            number.classList.add('d-none');
+            number.classList.add('d-sm-block');
+            number.innerText = index+1;
+            textGroup.appendChild(number);
+
+            const image = document.createElement('img');
+            image.src = member.photoURL;
+            image.classList.add('rounded-circle');
+            image.classList.add('me-2');
+            image.classList.add('d-none');
+            image.classList.add('d-sm-block');
+            image.width = 32;
+            image.height = 32;
+            textGroup.appendChild(image);
 
             const mainText = document.createElement('p');
             mainText.classList.add('mb-1');
-            mainText.innerText = `${index+1}. ${member.name} - ${member.point}p`;
+            mainText.innerText = `${member.name}  ${member.point}p`;
+            textGroup.appendChild(mainText)
 
-            const subText = document.createElement('small');
-            subText.classList.add('text-muted');
-            subText.innerText = member.email;
-            textGroup.appendChild(mainText);
-            textGroup.appendChild(subText);
+            // const subText = document.createElement('small');
+            // subText.classList.add('text-muted');
+            // subText.innerText = member.email;;
+            // textGroup.appendChild(subText);
 
 
 
