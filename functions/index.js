@@ -314,8 +314,10 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
             }, 0);
 
             const logsOfAnswerMember = logs.filter(log => log.selecOption === answer);
+            const receivedPointMap = new Map();
             const totalBettingPointOfAnswerMember = logsOfAnswerMember.reduce((acc, log) => {
-                const { bettingPoint = 0 } = log;
+                const { bettingPoint = 0, uid } = log;
+                receivedPointMap.set(uid, 0);
                 acc += Number(bettingPoint);
                 return acc;
             }, 0);
@@ -334,6 +336,9 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                 }
                 const member = memberDoc.data();
                 const point = member.point;
+
+                receivedPointMap.set(log.uid, 
+                    receivedPointMap.get(log.uid) + receivedPoint);
 
                 batch.update(memberRef, {
                     point: point + receivedPoint,
@@ -354,6 +359,70 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
 
                 batch.set(logsInMemberRef, receivedLog);
             };
+
+            if (game.teamPoint) {
+                const membersRef = admin.firestore().collection('members');
+                const membersSnapshot = await membersRef.get();
+                const members = membersSnapshot.docs.map(doc => doc.data());
+
+                if (members.empty) {
+                    throw new Error('회원 정보들이 존재하지 않습니다.');
+                }
+
+                let winnerTeam = '';
+                if (
+                    answer === "청팀"
+                    || answer === "백팀"
+                ) {
+                    // 팀전
+                    winnerTeam = answer;
+                } else {
+                    // 개인전
+                    const winnerMemberName = answer;
+                    const winnerMember = members.find(member => member.name === winnerMemberName);
+                    if (!winnerMember) {
+                        throw new Error(`우승상금 부여할 '${answer}'님의 정보가 존재하지 않습니다.`);
+                    }
+                    winnerTeam = winnerMember.team;
+                }
+
+                if (!winnerTeam) {
+                    throw new Error('우승상금 부여할 팀이 존재하지 않습니다.');
+                }
+
+                for (const member of members) {
+                    if (member.team === winnerTeam) {
+                        const teamPointLogId = uuidv4();
+                        const memberRef = admin.firestore().collection('members').doc(member.uid);
+                        const logsInMemberRef = admin.firestore().collection('members').doc(member.uid).collection('games').doc(teamPointLogId);
+                        const receivedPoint = Number(game.teamPoint);
+                        const point = Number(member.point) + receivedPointMap.get(member.uid);
+
+                        batch.update(memberRef, {
+                            point: point + receivedPoint,
+                        });
+
+                        const receivedLog = {
+                            id: teamPointLogId,
+                            receivedPoint,
+                            selecOption: winnerTeam,
+                            bettingPoint: 0,
+                            teamPoint: game.teamPoint,
+                            gameName: game.name,
+                            userName: member.name,
+                            userPoint: point + receivedPoint,
+                            gameId: game.id,
+                            uid: member.uid,
+                            createdAt: new Date(),
+                        };
+
+                        batch.set(logsInMemberRef, receivedLog);
+                    }
+                }
+                
+
+
+            }
 
             batch.update(gameRef, {
                 answer,

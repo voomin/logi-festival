@@ -232,7 +232,15 @@
             </div>
             <div class="modal-body">
                 <h5 id="gameDetailAnswer" class="mb-3" style="display: none;"></h5>
-                <p id="gameDetailTotalPoint"></p>
+                <div class="my-3">
+                    <p id="gameDetailTeamPoint"></p>
+                    <p id="gameDetailTotalPoint" ></p>
+                    <small class="text-muted">
+                        배팅시 받게될 포인트 = 총 배팅 포인트 * 내가 배팅한 포인트 / 맞춘사람들의 총 배팅 포인트
+                    </small>
+                </div>
+
+                <label for="basic-url" class="form-label">배팅한 사람들</label>
                 <div id="gameDetailModalBody">
 
                 </div>
@@ -275,7 +283,7 @@
         </div>
     </div>
 
-    <!-- 게임 생성 모달 -->
+    <!-- 운동 추가 모달 -->
     <div class="modal fade" id="gameCreateModal" tabindex="-1"  aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
@@ -286,27 +294,39 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="gameTitleInput1" class="form-label">제목</label>
-                    <input type="email" class="form-control" id="gameTitleInput1" placeholder="">
-                    
+                    <input type="title" class="form-control" id="gameTitleInput1" placeholder="">
                 </div>
                 
-                <div class="form-check mb-3">
-                    <input class="form-check-input" 
-                        value="team"
-                        type="radio" name="gameType" id="gameRadioDefault1" checked
-                    >
-                    <label class="form-check-label" for="gameRadioDefault1">
-                      팀전
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input"
-                        value="solo"
-                     type="radio" name="gameType" id="gameRadioDefault2">
-                    <label class="form-check-label" for="gameRadioDefault2">
-                      개인전
-                    </label>
+                <div class="mb-3">
+                    <label for="gameRadioDefault1" class="form-label">종류</label>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" 
+                            value="team"
+                            type="radio" name="gameType" id="gameRadioDefault1" checked
+                        >
+                        <label class="form-check-label" for="gameRadioDefault1">
+                        팀전
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input"
+                            value="solo"
+                        type="radio" name="gameType" id="gameRadioDefault2">
+                        <label class="form-check-label" for="gameRadioDefault2">
+                        개인전
+                        </label>
+                    </div>
                 </div>
+
+                <!-- 운동에서 이긴팀이 받게 될 포인트 -->
+                <div class="my-3">
+                    <label for="gameCreateModalTeamPointInput" class="form-label">팀 포인트</label>
+                    <input type="number" class="form-control" id="gameCreateModalTeamPointInput" placeholder="" value="500">
+                    <div class="form-text">(팀전 예시) 청팀이 이긴 경우, 청팀 모두 받게될 포인트</div>
+                    <div class="form-text">(개인전 예시) 김부민이 1등한 경우, 김부민에 해당하는 백팀 모두가 받게될 포인트</div>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -319,7 +339,7 @@
         </div>
     </div>
 
-    <!-- 게임 admin 모달 -->
+    <!-- 운동 admin 모달 -->
     <div class="modal fade" id="gameAdminModal" tabindex="-1"  aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
@@ -365,15 +385,67 @@
         </div>
         </div>
     </div>
+
+
+    <!-- 회원 admin 모달 -->
+    <div class="modal fade" id="memberAdminModal" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="memberAdminModalLabel">Admin</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="memberTeamSelect" class="form-label">팀 선택</label>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" 
+                            value="청팀"
+                            type="radio" name="team" id="memberTeamSelect1"
+                        >
+                        <label class="form-check-label" for="memberTeamSelect1">
+                        청팀
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input"
+                            value="백팀"
+                        type="radio" name="team" id="memberTeamSelect2">
+                        <label class="form-check-label" for="memberTeamSelect2">
+                        백팀
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button 
+                    id="memberAdminModalSubmitButton"
+                    type="button" class="btn btn-primary" >적용</button>
+                <!-- spinner -->
+                <div class="spinner-border text-primary" role="status" id="memberAdminModalSubmitButtonSpinner" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
     async function gameAdd() {
         const title = document.getElementById('gameTitleInput1').value;
         const gameType = document.querySelector('input[name="gameType"]:checked').value;
+        const teamPoint = document.getElementById('gameCreateModalTeamPointInput').value;
 
         if (title === "") {
             alert("제목을 입력해주세요.");
+            return;
+        }
+        if (teamPoint === "") {
+            alert("팀 포인트를 입력해주세요.");
             return;
         }
 
@@ -382,9 +454,9 @@
 
         
         if (gameType === "team") {
-            await window.bm.class.GameManager.teamAdd(title);
+            await window.bm.class.GameManager.teamAdd(title, teamPoint);
         } else if (gameType === "solo") {
-            await window.bm.class.GameManager.logibrosAdd(title);
+            await window.bm.class.GameManager.logibrosAdd(title, teamPoint);
         } else {
             alert("게임 타입을 선택해주세요.");
             return;

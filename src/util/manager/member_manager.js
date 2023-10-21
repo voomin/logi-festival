@@ -1,4 +1,4 @@
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, updateDoc } from "firebase/firestore";
 import Auth from "../../auth";
 import MemberModel from "../model/member_model";
 import FirebaseManager from "./firebase_manager";
@@ -79,6 +79,22 @@ export default class MemberManager {
             .sort((a, b) => b.createdAt - a.createdAt);
     }
 
+    static async updateTeam(uid, team) {
+        try {
+            const memberDocRef = await doc(FirebaseManager.db, "members", uid);
+            
+            await updateDoc(memberDocRef, {
+                team,
+            });
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            alert('팀 변경에 실패했습니다.');
+            return false;
+        }
+    }
+
     static setPointInHtml(point) {
         const myPoint = document.getElementById('myPoint');
         const memberPoint = document.getElementById('memberPoint');
@@ -127,14 +143,22 @@ export default class MemberManager {
             li.appendChild(textGroup);
             
             const number = document.createElement('span');
-            number.classList.add('badge');
-            number.classList.add('bg-primary');
-            number.classList.add('rounded-pill');
-            number.classList.add('me-2');
-            number.classList.add('d-none');
-            number.classList.add('d-sm-block');
-            number.innerText = index+1;
+            number.innerText = `${index+1}.`;
             textGroup.appendChild(number);
+
+            const teamDoc = document.createElement('span');
+            teamDoc.classList.add('badge');
+            if (member.team === "청팀") {
+                teamDoc.classList.add('bg-primary');
+            } else if (member.team === "백팀"){
+                teamDoc.classList.add('text-bg-light');
+            } else {
+                teamDoc.classList.add('text-bg-warning');
+            }
+            teamDoc.classList.add('rounded-pill');
+            teamDoc.classList.add('mx-2');
+            teamDoc.innerText = member.team || '??';
+            textGroup.appendChild(teamDoc);
 
             const image = document.createElement('img');
             image.src = member.photoURL;
@@ -163,6 +187,38 @@ export default class MemberManager {
             btnGroup.classList.add('btn-group-sm');
             btnGroup.setAttribute('role', 'group');
             btnGroup.setAttribute('aria-label', 'Basic example');
+
+            const adminButton = document.createElement('button');
+            adminButton.classList.add('btn');
+            adminButton.classList.add('btn-warning');
+            adminButton.setAttribute('data-bs-toggle', 'modal');
+            adminButton.setAttribute('data-bs-target', '#memberAdminModal');
+            adminButton.innerText = '관리';
+            adminButton.onclick = async () => {
+                const memberAdminModalLabel = document.getElementById('memberAdminModalLabel');
+                memberAdminModalLabel.innerText = member.name + ' 관리';
+                
+                const memberAdminModalSubmitButton = document.getElementById('memberAdminModalSubmitButton');
+                memberAdminModalSubmitButton.onclick = async () => {
+                    const team = document.querySelector('input[name="team"]:checked');
+                    if (!team) {
+                        alert('팀을 선택해주세요.');
+                        return;
+                    }
+
+                    const memberAdminModalSpinner = document.getElementById('memberAdminModalSubmitButtonSpinner');
+                    memberAdminModalSpinner.style.display = 'inline-block';
+                    memberAdminModalSubmitButton.style.display = 'none';
+
+                    const result = await MemberManager.updateTeam(member.uid, team.value);
+                    if (result) {
+                        alert('정상적으로 변경되었습니다.');
+                    }
+                    memberAdminModalSpinner.style.display = 'none';
+                    memberAdminModalSubmitButton.style.display = 'inline-block';
+                }
+            };
+            btnGroup.appendChild(adminButton);
 
             const infoButton = document.createElement('button');
             infoButton.classList.add('btn');

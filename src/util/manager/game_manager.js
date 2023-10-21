@@ -75,36 +75,42 @@ export default class GameManager{
         
     }
 
-    static async teamAdd(title) {
+    static async teamAdd(title, teamPoint) {
         await GameManager.add(
-            GameModel.createByNameAndOptions(title, [
-                '청팀', '백팀'
-            ]),
+            GameModel.createByNameAndOptions(
+                title, 
+                ['청팀', '백팀'],
+                teamPoint,
+            ),
         );
     }
 
-    static async logibrosAdd(title) {
+    static async logibrosAdd(title, teamPoint) {
         await GameManager.add(
-            GameModel.createByNameAndOptions(title, [
-                "노상민",
-                "최성환",
-                "김효상",
-                "김형기",
-                "심지훈",
-                "김부민",
-                "최수연",
-                "서반석",
-                "정호룡",
-                "임종현",
-                "박새롬",
-                "신병우",
-                "이주혁",
-                "서유리",
-                "이미르",
-                "김상현",
-                "박수정",
-                "조혜선",
-            ]),
+            GameModel.createByNameAndOptions(
+                title, 
+                [
+                    "노상민",
+                    "최성환",
+                    "김효상",
+                    "김형기",
+                    "심지훈",
+                    "김부민",
+                    "최수연",
+                    "서반석",
+                    "정호룡",
+                    "임종현",
+                    "박새롬",
+                    "신병우",
+                    "이주혁",
+                    "서유리",
+                    "이미르",
+                    "김상현",
+                    "박수정",
+                    "조혜선",
+                ], 
+                teamPoint,
+            ),
         );
     }
 
@@ -271,20 +277,25 @@ export default class GameManager{
             detailButton.classList.add('btn-info');
             detailButton.setAttribute('data-bs-toggle', 'modal');
             detailButton.setAttribute('data-bs-target', '#gameDetailModal');
-            detailButton.innerText = '이력보기';
+            detailButton.innerText = '정보보기';
             detailButton.onclick = async () => {
                 const spiner = document.getElementById('gameDetailModalSpinner');
                 spiner.style.display = 'inline-block';
 
                 const gameDetailTotalPoint = document.getElementById('gameDetailTotalPoint');
                 gameDetailTotalPoint.innerText = '';
+                const gameDetailTeamPoint = document.getElementById('gameDetailTeamPoint');
+                gameDetailTeamPoint.innerText = '';
+                if (game.teamPoint) {
+                    gameDetailTeamPoint.innerText = `우승상금(팀 포인트): ${game.teamPoint}`;
+                }
 
                 const logs = await GameManager.getLogsById(game.id);
                 
                 const gameDetailModalBody = document.getElementById('gameDetailModalBody');
                 gameDetailModalBody.innerHTML = '';
                 const gameDetailModalLabel = document.getElementById('gameDetailModalLabel');
-                gameDetailModalLabel.innerText = game.name + ' 상세이력';
+                gameDetailModalLabel.innerText = game.name + ' 정보';
 
                 const gameDetailAnswer = document.getElementById('gameDetailAnswer');
                 gameDetailAnswer.style.display = 'none';
@@ -296,7 +307,9 @@ export default class GameManager{
                 if (logs.length === 0) {
                     const logDoc = document.createElement('div');
                     logDoc.classList.add('list-group-item');
-                    logDoc.innerText = '이력이 없습니다.';
+                    logDoc.classList.add('text-muted');
+                    logDoc.classList.add('text-center');
+                    logDoc.innerText = '없습니다.';
                     gameDetailModalBody.appendChild(logDoc);
                 }
                 let totalPoint = 0;
