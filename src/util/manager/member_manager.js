@@ -239,6 +239,9 @@ export default class MemberManager {
                 const option = memberNameSelect.querySelector('option[value="' + member.name + '"]');
                 if (option) {
                     option.selected = true;
+                } else {
+                    const firstOption = memberNameSelect.querySelector('option');
+                    firstOption.selected = true;
                 }
 
                 const curentTeam = member.team;
@@ -248,6 +251,9 @@ export default class MemberManager {
                     blueTeamRadio.checked = true;
                 } else if (curentTeam === '백팀') {
                     whiteTeamRadio.checked = true;
+                } else {
+                    blueTeamRadio.checked = false;
+                    whiteTeamRadio.checked = false;
                 }
 
 
