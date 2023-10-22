@@ -80,11 +80,30 @@ export default class MemberManager {
             .sort((a, b) => b.createdAt - a.createdAt);
     }
 
-    static async updateTeam(uid, team) {
+    async updatePhotoURL(photoURL) {
+        try {
+            const uid = this.me.uid;
+            
+            const memberDocRef = await doc(FirebaseManager.db, "members", uid);
+            
+            await updateDoc(memberDocRef, {
+                photoURL,
+            });
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            alert('이미지 변경에 실패했습니다.');
+            return false;
+        }
+    }
+
+    static async updateMember({ uid, name, team }) {
         try {
             const memberDocRef = await doc(FirebaseManager.db, "members", uid);
             
             await updateDoc(memberDocRef, {
+                name,
                 team,
             });
 
@@ -106,12 +125,16 @@ export default class MemberManager {
     static meInHtml(me) {
         if (!me) return;
         const profileImg = document.getElementById('profile-img');
+        const profileImg2 = document.getElementById('profile-img2');
+        const photoUrlInput = document.getElementById('photoUrlInput');
         const name = document.getElementById('name');
         const email = document.getElementById('email');
 
         profileImg.src = me.photoURL;
+        profileImg2.src = me.photoURL;
         name.innerText = me.name;
         email.innerText = me.email;
+        photoUrlInput.value = me.photoURL;
 
         document.getElementById('memberBox1').style.display = 'block';
         // document.getElementById('memberBox2').style.display = 'block';
@@ -199,9 +222,26 @@ export default class MemberManager {
             adminButton.onclick = async () => {
                 const memberAdminModalLabel = document.getElementById('memberAdminModalLabel');
                 memberAdminModalLabel.innerText = member.name + ' 관리';
+
+                const memberAdminModalEmail = document.getElementById('memberAdminModalEmail');
+                memberAdminModalEmail.innerText = member.email;
                 
                 const memberAdminModalSubmitButton = document.getElementById('memberAdminModalSubmitButton');
+
+                const memberNameSelect = document.getElementById('memberNameSelect');
+                // selected 해놓기
+                const option = memberNameSelect.querySelector('option[value="' + member.name + '"]');
+                if (option) {
+                    option.selected = true;
+                }
+
+
                 memberAdminModalSubmitButton.onclick = async () => {
+                    const memberName = memberNameSelect.options[memberNameSelect.selectedIndex].value;
+                    if (!memberName) {
+                        alert('이름을 선택해주세요.');
+                        return;
+                    }
                     const team = document.querySelector('input[name="team"]:checked');
                     if (!team) {
                         alert('팀을 선택해주세요.');
@@ -212,7 +252,11 @@ export default class MemberManager {
                     memberAdminModalSpinner.style.display = 'inline-block';
                     memberAdminModalSubmitButton.style.display = 'none';
 
-                    const result = await MemberManager.updateTeam(member.uid, team.value);
+                    const result = await MemberManager.updateMember({
+                        uid: member.uid, 
+                        team: team.value,
+                        name: memberName,
+                    });
                     if (result) {
                         alert('정상적으로 변경되었습니다.');
                     }

@@ -46,6 +46,7 @@ exports.welcomeLogibros = seoul.auth.user().onCreate((user) => {
     const userRef = admin.firestore().collection('members').doc(uid);
     userRef.set({
       uid,
+      isAdmin: false,
       name: displayName,
       email,
       photoURL,

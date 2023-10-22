@@ -43,16 +43,37 @@
                     aria-expanded="false">
                     <img src="" alt="" id="profile-img" class="rounded-circle" style="width: 30px; height: 30px;">
                 </button>
-                <ul class="dropdown-menu ">
-                    <li class="dropdown-item-text">
-                        <div class="col">
-                            <p id="name">이름없음</p>
-                            <p id="email">--@logibros.com</p>
+                <ul class="dropdown-menu col-lg-7" style="width: 15rem;">
+                    <li>
+                        <div class="row g-3 dropdown-item-text">
+                            <div class="col-auto d-flex align-items-center">
+                                <img src="" alt="" id="profile-img2" class="rounded-circle me-1" style="width: 50px; height: 50px;">
+
+                                <div class="col-auto text-muted ms-1 text-wrap">
+                                    <span id="name" class="mb-3">이름없음</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                              <!-- <label for="photoUrlInput" class="visually-hidden">Password</label> -->
+                              <input type="text" class="form-control" id="photoUrlInput" placeholder="https://프로필_이미지_URL_경로">
+                            </div>
+                            <div class="col-auto">
+                              <button type="submit" class="btn btn-outline-primary mb-3 btn-sm" onclick="clickPhotoUrlChange()">이미지 변경하기</button>
+                              <!-- spinner -->
+                                <div class="spinner-border text-primary" role="status" id="profileImgSpinner" style="display: none;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </li>
-                    <li class="dropdown-item">
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <p id="email" class="dropdown-item-text">--@logibros.com</p>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
                         <button
-                            class="btn dropdown-item"
+                            class="dropdown-item"
                             onclick="window.bm.auth.logout()"
                         >
                             로그아웃
@@ -225,10 +246,19 @@
                 <h5 id="gameDetailAnswer" class="mb-3" style="display: none;"></h5>
                 <div class="my-3">
                     <p id="gameDetailTeamPoint"></p>
-                    <p id="gameDetailTotalPoint" ></p>
-                    <small class="text-muted">
-                        배팅시 받게될 포인트 = 총 배팅 포인트 * 내가 배팅한 포인트 / 맞춘사람들의 총 배팅 포인트
-                    </small>
+                    <!-- 수직 가운데 정렬 -->
+                    <p class="d-inline-flex gap-1 w-100 align-items-center justify-content-between">
+                        <span id="gameDetailTotalPoint" ></span>
+                        <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#totalPointDetaulDescription" aria-expanded="false" aria-controls="totalPointDetaulDescription">
+                         자세히
+                        </button>
+                    </p>
+                    <div class="collapse" id="totalPointDetaulDescription">
+                        <div class="card card-body">
+                            배팅시 받게될 포인트 = 총 배팅 포인트 * 내가 배팅한 포인트 / 맞춘사람들의 총 배팅 포인트
+                        </div>
+                    </div>
+                    
                 </div>
 
                 <label for="basic-url" class="form-label">배팅한 사람들</label>
@@ -387,6 +417,36 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <p>
+                    이메일: <span id="memberAdminModalEmail"></span>
+                </p>
+                <!-- 이름 변경란 -->
+                <div class="mb-3">
+                    <label for="memberNameSelect" class="form-label">이름</label>
+
+                    <select class="form-select" aria-label="Default select example" id="memberNameSelect">
+                        <option selected></option>
+                        <option value="노상민">노상민</option>
+                        <option value="최성환">최성환</option>
+                        <option value="김효상">김효상</option>
+                        <option value="김형기">김형기</option>
+                        <option value="심지훈">심지훈</option>
+                        <option value="김부민">김부민</option>
+                        <option value="최수연">최수연</option>
+                        <option value="서반석">서반석</option>
+                        <option value="정호룡">정호룡</option>
+                        <option value="임종현">임종현</option>
+                        <option value="박새롬">박새롬</option>
+                        <option value="신병우">신병우</option>
+                        <option value="이주혁">이주혁</option>
+                        <option value="서유리">서유리</option>
+                        <option value="이미르">이미르</option>
+                        <option value="김상현">김상현</option>
+                        <option value="박수정">박수정</option>
+                        <option value="조혜선">조혜선</option>
+                    </select>
+                    
+                </div>
                 <div class="mb-3">
                     <label for="memberTeamSelect" class="form-label">팀 선택</label>
                     
@@ -456,5 +516,31 @@
         document.getElementById('gameCreateSubmitButton').style.display = "block";
         document.getElementById('gameCreateSubmitSpinner').style.display = "none";
 
+    }
+
+    async function clickPhotoUrlChange() {
+        const photoUrl = document.getElementById('photoUrlInput').value;
+        if (photoUrl === "") {
+            alert("URL을 입력해주세요.");
+            return;
+        }
+        if (photoUrl.indexOf('http') === -1) {
+            alert("URL 형식이 아닙니다.");
+            return;
+        }
+        // 길이 제한
+        if (photoUrl.length > 200) {
+            alert("URL이 너무 깁니다.");
+            return;
+        }
+
+        document.getElementById('profileImgSpinner').style.display = "block";
+        const result = await window.bm.memberManager.updatePhotoURL(photoUrl);
+        if (result) {
+            document.getElementById('profile-img').src = photoUrl;
+            document.getElementById('profile-img2').src = photoUrl;
+            alert('이미지가 변경되었습니다.');
+        }
+        document.getElementById('profileImgSpinner').style.display = "none";
     }
 </script>
