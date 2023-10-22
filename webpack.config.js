@@ -14,9 +14,13 @@ module.exports = {
         index: "./src/index.js",
         // another: "./src/another-module.js"
     },
+    // build: {
+    //     assetsPublicPath: '/public/',
+    // },
     output: {
         filename: "[name].bundle.js",
-        path: path.resolve(__dirname, "dist")
+        path: path.resolve(__dirname, "dist"),
+        publicPath: "/", // 수정: publicPath를 '/'로 설정
     },
     optimization: {
         splitChunks: {

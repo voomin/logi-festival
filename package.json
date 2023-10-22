@@ -6,7 +6,8 @@
   "scripts": {
     "serve": "yarn webpack serve --mode development",
     "build": "yarn webpack build --mode production",
-    "start:emulators": "firebase emulators:start"
+    "start:emulators": "firebase emulators:start",
+    "deploy": "npm run build && firebase deploy"
   },
   "repository": {
     "type": "git",
