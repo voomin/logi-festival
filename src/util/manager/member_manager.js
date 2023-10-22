@@ -38,38 +38,39 @@ export default class MemberManager {
                 .map(doc => new MemberModel(doc.data()))
                 .sort((a, b) => b.point - a.point);
 
+            console.log('watchCollection', {
+                members,
+            });
+
             this.children = members;
-            MemberManager.setListInHtml(members);
 
             const uid = Auth.getInstance().uid;
             if (uid) {
                 const me = members.find(member => member.uid === uid);
                 if (me) {
-                    this.setMe(me);
+                    this.me = new MemberModel(me);
+                    Auth.signInHtml(this.me);
                     MemberManager.meInHtml(me);
                     MemberManager.setPointInHtml(me.point);
                     GameManager.setListInHtml(GameManager.getInstance().children);
                 }
             }
-            console.log('watchCollection', {
-                members,
-            });
+            MemberManager.setListInHtml(members);
         });
     }
 
     setMeByUid(uid) {
         const me = this.children.find(member => member.uid === uid);
-        if (me) this.setMe(me);
+        if (me) {
+            this.me = new MemberModel(me);
+        } else {
+            console.error('setMeByUid', 'me is null');
+        }
     }
 
 
     out() {
         this.me = null;
-    }
-
-    setMe(member) {
-        this.me = new MemberModel(member);
-        Auth.signInHtml(this.me);
     }
 
     static async getLogsByUid(uid) {
@@ -103,6 +104,7 @@ export default class MemberManager {
     }
 
     static meInHtml(me) {
+        if (!me) return;
         const profileImg = document.getElementById('profile-img');
         const name = document.getElementById('name');
         const email = document.getElementById('email');
@@ -116,7 +118,7 @@ export default class MemberManager {
         const guestBox = document.getElementById('guestBox');
         guestBox.style.display = 'none';
 
-        if (me.isAdmin) {
+        if (MemberManager.getInstance().isAdmin) {
             const gameCreateButton = document.getElementById('gameCreateButton');
             gameCreateButton.style.display = 'inline-block';
         }
@@ -218,7 +220,10 @@ export default class MemberManager {
                     memberAdminModalSubmitButton.style.display = 'inline-block';
                 }
             };
-            btnGroup.appendChild(adminButton);
+
+            if (MemberManager.getInstance().isAdmin ) {
+                btnGroup.appendChild(adminButton);
+            }
 
             const infoButton = document.createElement('button');
             infoButton.classList.add('btn');

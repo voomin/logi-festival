@@ -22,23 +22,13 @@ export default class Auth {
                 });
                 this.uid = user.uid;
                 
-                const memberManager = MemberManager.getInstance();
-                const me = memberManager.me;
-                if (me) {
-                    Auth.signInHtml(me);
-                    MemberManager.meInHtml(me);
-                } else {
-                    memberManager.setMeByUid(this.uid);
-                    MemberManager.getInstance().setMeByUid(this.uid);
-                    Auth.signInHtml(memberManager.me);
-                }
+                MemberManager.getInstance().setMeByUid(this.uid);
+                Auth.signInHtml(MemberManager.getInstance().me);
+                MemberManager.meInHtml(MemberManager.getInstance().me);
+                MemberManager.setListInHtml(MemberManager.getInstance().children);
                 GameManager.setListInHtml(GameManager.getInstance().children);
             } else {
                 this.uid = null;
-                // window.memberInGoogle = null;
-                // window.memberInFirestore = null;
-                // window.onSignOut();
-                // console.log('user signed out');
             }
         });
     }
@@ -81,7 +71,12 @@ export default class Auth {
             const loginButton = document.getElementById('loginButton');
             loginButton.disabled = false;
             loginButton.innerText = '로그인';
+            const gameCreateButton = document.getElementById('gameCreateButton');
+            gameCreateButton.style.display = 'none';
+
             GameManager.setListInHtml(GameManager.getInstance().children);
+            MemberManager.setListInHtml(MemberManager.getInstance().children);
+
         }).catch((error) => {
             console.error(error);
             // An error happened.
