@@ -9,6 +9,18 @@ service cloud.firestore {
     function isOwner(uid) {
       return request.auth.uid != null && request.auth.uid == uid;
     }
+    // member 데이터 유효성 검사
+    function isValidMember(uid) {
+      return (
+        request.resource.data.uid == uid &&
+        request.resource.data.isAdmin == false &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string &&
+        request.resource.data.photoURL is string &&
+        request.resource.data.point is int &&
+        request.resource.data.team is string
+      );
+    }
     match /games/{gameId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -21,8 +33,16 @@ service cloud.firestore {
     }
     match /members/{memberId} {
       allow read: if true;
-      allow create, delete: if false;
-      allow update: if request.resource.data.keys().hasAll(['name', 'photoURL']);
+      allow create: if (
+          isValidMember(memberId) &&
+          request.resource.data.point >= 0
+        );
+      allow delete: if false;
+      allow update: if (
+          isValidMember(memberId) &&
+          request.resource.data.point >= 0
+        );
+      // allow update: if isOwner(memberId) && request.resource.data.keys().hasAll(['name', 'photoURL']);
       
       match /games/{logId} {
         allow read: if true;
