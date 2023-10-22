@@ -363,8 +363,7 @@ export default class GameManager{
         });
         gameNotActivated.forEach((game) => {
             game.classList.add('d-none');
-        });
-
+        }); 
     }
 
     static allView() {

@@ -63,3 +63,8 @@
   color: #fff;
   border-bottom-color: #fff;
 }
+
+
+.progress {
+  transition: width 2s ease;
+}

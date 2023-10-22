@@ -83,7 +83,7 @@ export default class MemberManager {
     async updatePhotoURL(photoURL) {
         try {
             const uid = this.me.uid;
-            
+
             const memberDocRef = await doc(FirebaseManager.db, "members", uid);
             
             await updateDoc(memberDocRef, {
@@ -151,6 +151,10 @@ export default class MemberManager {
         const rankBox = document.getElementById('rankBox');
         const ol = rankBox.querySelector('ol');
         ol.innerHTML = '';
+
+        let blueTeamTotalPoint = 0;
+        let whiteTeamTotalPoint = 0;
+
         members.forEach((member, index) => {
             const li = document.createElement('li');
             li.classList.add('list-group-item');
@@ -175,8 +179,10 @@ export default class MemberManager {
             teamDoc.classList.add('badge');
             if (member.team === "청팀") {
                 teamDoc.classList.add('bg-primary');
+                blueTeamTotalPoint += member.point;
             } else if (member.team === "백팀"){
                 teamDoc.classList.add('text-bg-light');
+                whiteTeamTotalPoint += member.point;
             } else {
                 teamDoc.classList.add('text-bg-warning');
             }
@@ -235,6 +241,15 @@ export default class MemberManager {
                     option.selected = true;
                 }
 
+                const curentTeam = member.team;
+                const blueTeamRadio = document.getElementById('memberTeamSelect1');
+                const whiteTeamRadio = document.getElementById('memberTeamSelect2');
+                if (curentTeam === '청팀') {
+                    blueTeamRadio.checked = true;
+                } else if (curentTeam === '백팀') {
+                    whiteTeamRadio.checked = true;
+                }
+
 
                 memberAdminModalSubmitButton.onclick = async () => {
                     const memberName = memberNameSelect.options[memberNameSelect.selectedIndex].value;
@@ -245,6 +260,14 @@ export default class MemberManager {
                     const team = document.querySelector('input[name="team"]:checked');
                     if (!team) {
                         alert('팀을 선택해주세요.');
+                        return;
+                    }
+
+                    if (
+                        memberName === member.name &&
+                        team.value === member.team
+                    ) {
+                        alert('변경된 내용이 없습니다.');
                         return;
                     }
 
@@ -286,6 +309,27 @@ export default class MemberManager {
 
             ol.appendChild(li);
         });
+
+        const blueTemaProgress = document.getElementById('blueTemaProgress');
+        const whiteTemaProgress = document.getElementById('whiteTemaProgress');
+        const blueTemaProgressText = document.getElementById('blueTemaProgressText');
+        const whiteTemaProgressText = document.getElementById('whiteTemaProgressText');
+
+        try {
+            const blueTemaProgressPercent = Math.floor(blueTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
+            const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
+            blueTemaProgress.style.width = blueTemaProgressPercent + '%';
+            whiteTemaProgress.style.width = whiteTemaProgressPercent + '%';
+            blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (' + blueTeamTotalPoint + 'p)';
+            whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (' + whiteTeamTotalPoint + 'p)';
+        } catch(err) {
+            blueTemaProgress.style.width = 50 + '%';
+            whiteTemaProgress.style.width = 50 + '%';
+            blueTemaProgressText.innerText = "푸른 눈의 청룡";
+            whiteTemaProgressText.innerText = "백색 눈의 호룡";
+        }
+        
+
     }
 
     static async setDetailModalInHtml(member) {
