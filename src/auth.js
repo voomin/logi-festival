@@ -75,6 +75,9 @@ export default class Auth {
             const guestBox = document.getElementById('guestBox');
             guestBox.style.display = 'block';
 
+            const mainNav = document.getElementById('mainNav');
+            mainNav.style.display = 'none';
+
             const loginButton = document.getElementById('loginButton');
             loginButton.disabled = false;
             loginButton.innerText = '로그인';
@@ -95,6 +98,9 @@ export default class Auth {
         name.innerText = member.name;
         const email = document.getElementById('email');
         email.innerText = member.email;
+
+        const mainNav = document.getElementById('mainNav');
+        mainNav.style.display = 'block';
 
         document.getElementById('memberBox1').style.display = 'block';
         // document.getElementById('memberBox2').style.display = 'block';
