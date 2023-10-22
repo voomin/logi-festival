@@ -322,12 +322,16 @@ export default class MemberManager {
         const whiteTemaProgressText = document.getElementById('whiteTemaProgressText');
 
         try {
+            if (blueTeamTotalPoint + whiteTeamTotalPoint <= 0) {
+                throw new Error('포인트가 없습니다.');
+            }
             const blueTemaProgressPercent = Math.floor(blueTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
             const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
             blueTemaProgress.style.width = blueTemaProgressPercent + '%';
             whiteTemaProgress.style.width = whiteTemaProgressPercent + '%';
             blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (' + blueTeamTotalPoint + 'p)';
             whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (' + whiteTeamTotalPoint + 'p)';
+            
         } catch(err) {
             blueTemaProgress.style.width = 50 + '%';
             whiteTemaProgress.style.width = 50 + '%';
