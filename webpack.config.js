@@ -1,11 +1,9 @@
+const webpack = require('webpack')
 const HtmlWebpackPlugin =  require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-    mode: 'development',
-    // entry: "./script.js",
-    // module: "commonjs",
     performance: {
         hints: false,
         maxEntrypointSize: 512000,
