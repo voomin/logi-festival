@@ -5,6 +5,7 @@ import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
 import GameManager from "./game_manager";
 import define from "../../util/define";
+import LogModel from "../../util/model/log_model";
 
 export default class MemberManager {
     static instance = null;
@@ -77,7 +78,7 @@ export default class MemberManager {
     static async getLogsByUid(uid) {
         const logInMemberQuerySnapshot = await getDocs(collection(FirebaseManager.db, "members", uid, "logs"));
         return logInMemberQuerySnapshot.docs
-            .map(doc => doc.data())
+            .map(doc => new LogModel(doc.data()))
             .sort((a, b) => b.createdAt - a.createdAt);
     }
 

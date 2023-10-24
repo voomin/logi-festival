@@ -5,6 +5,7 @@ import GameModel from "../../util/model/game_model";
 import { httpsCallableFromURL } from "firebase/functions";
 import MemberManager from "./member_manager";
 import define from "../../util/define";
+import LogModel from "../../util/model/log_model";
 
 export default class GameManager{
     static instance = null;
@@ -115,7 +116,7 @@ export default class GameManager{
     static async getLogsById(id) {
         const logInGameQuerySnapshot = await getDocs(collection(FirebaseManager.db, "games", id, "logs"));
         return logInGameQuerySnapshot.docs
-            .map(doc => doc.data())
+            .map(doc => new LogModel(doc.data()))
             .sort((a, b) => b.createdAt - a.createdAt);
     }
 

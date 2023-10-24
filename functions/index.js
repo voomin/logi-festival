@@ -5,7 +5,11 @@ const cors = require('cors')({
 });
 const { v4: uuidv4 } = require('uuid');
 const { default: define } = require('../util/define');
-const seoul = functions.region('asia-northeast3');
+const { default: LogModel } = require('../util/model/log_model');
+const seoul = functions.region('asia-northeast3').runWith({
+    maxInstances: 20,
+    enforceAppCheck: true,
+});
 
 admin.initializeApp();
 
@@ -129,7 +133,7 @@ exports.betting = seoul.https.onRequest((req, res) => {
                 
                 user.point -= point;
 
-                const log = {
+                const log = LogModel.create({
                     id: logId,
                     selecOption,
                     bettingPoint: point,
@@ -138,12 +142,11 @@ exports.betting = seoul.https.onRequest((req, res) => {
                     userPoint: user.point,
                     gameId,
                     uid,
-                    createdAt: new Date(),
-                };
+                });
 
                 await transaction.update(userRef, user);
-                await transaction.set(logInMemberRef, log);
-                await transaction.set(logInGameRef, log);
+                await transaction.set(logInMemberRef, LogModel.toJson(log));
+                await transaction.set(logInGameRef, LogModel.toJson(log));
 
                 myPoint = user.point;
             });
@@ -344,7 +347,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                     point: point + receivedPoint,
                 });
 
-                const receivedLog = {
+                const receivedLog = LogModel.create({
                     id: logId,
                     receivedPoint,
                     selecOption: log.selecOption,
@@ -354,10 +357,9 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                     userPoint: log.userPoint + receivedPoint,
                     gameId: log.gameId,
                     uid: log.uid,
-                    createdAt: new Date(),
-                };
+                });
 
-                batch.set(logsInMemberRef, receivedLog);
+                batch.set(logsInMemberRef, LogModel.toJson(receivedLog));
             };
 
             if (game.teamPoint) {
@@ -399,7 +401,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                             point: point + receivedPoint,
                         });
 
-                        const receivedLog = {
+                        const receivedLog = LogModel.create({
                             id: teamPointLogId,
                             receivedPoint,
                             selecOption: winnerTeam,
@@ -411,9 +413,9 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                             gameId: game.id,
                             uid: member.uid,
                             createdAt: new Date(),
-                        };
+                        });
 
-                        batch.set(logsInMemberRef, receivedLog);
+                        batch.set(logsInMemberRef, LogModel.toJson(receivedLog));
                     }
                 }
                 

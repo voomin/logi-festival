@@ -147,4 +147,32 @@ describe('실제 logibros 세팅', function() {
             index++;
         }
     });
+
+    it('운동(game)들 세팅', async function() {
+        const games = [
+            '풋살',
+            '농구',
+            '볼링',
+            '당구',
+            '탁구',
+            '야구',
+            '배드민턴',
+        ];
+        const db = getFirestore(adminAuth);
+        const gamesRef = db.collection('games');
+        let index = 0;
+        for (game of games) {
+            const doc = gamesRef.doc();
+            await firebase.assertSucceeds(doc.set({
+                id: doc.id,
+                name: game,
+                options: [
+                    '청팀',
+                    '백팀',
+                ],
+                isOnBetting: false,
+            }));
+            index++;
+        }
+    });
 });
