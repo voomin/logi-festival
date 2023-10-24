@@ -1,5 +1,6 @@
 const assert = require('assert');
 const firebase = require('@firebase/testing');
+const { default: define } = require('../util/define');
 
 const MY_PROJECT_ID = 'logifestival';
 const myId = "askjflksdjfkljkfjaslkjflksjafkljasfl2";
@@ -102,26 +103,7 @@ describe('firestore 보안규칙 테스트', function() {
 
 
 describe('실제 logibros 세팅', function() {
-    const logibros = [
-        "노상민",
-        "최성환",
-        "김효상",
-        "김형기",
-        "심지훈",
-        "김부민",
-        "최수연",
-        "서반석",
-        "정호룡",
-        "임종현",
-        "박새롬",
-        "신병우",
-        "이주혁",
-        "서유리",
-        "이미르",
-        "김상현",
-        "박수정",
-        "조혜선",
-    ];
+    const logibros = define.logibrosNames;
     const members = [];
     let adminAuth = null;
     
@@ -152,7 +134,7 @@ describe('실제 logibros 세팅', function() {
         let index = 0;
         for (member of normalMembers) {
             const doc = db.collection('members').doc(member.uid);
-            const team = index % 2 === 0 ? '청팀' : '백팀';
+            const team = index % 2 === 0 ? define.getBlueTeam() : define.getWhiteTeam();
             console.log({
                 uid: member.uid,
                 team,

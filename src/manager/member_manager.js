@@ -1,9 +1,10 @@
 import { collection, doc, getDocs, onSnapshot, updateDoc } from "firebase/firestore";
-import Auth from "../../auth";
-import MemberModel from "../model/member_model";
+import Auth from "../auth";
+import MemberModel from "../../util/model/member_model";
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
 import GameManager from "./game_manager";
+import define from "../../util/define";
 
 export default class MemberManager {
     static instance = null;
@@ -177,10 +178,10 @@ export default class MemberManager {
 
             const teamDoc = document.createElement('span');
             teamDoc.classList.add('badge');
-            if (member.team === "청팀") {
+            if (member.team === define.getBlueTeam()) {
                 teamDoc.classList.add('bg-primary');
                 blueTeamTotalPoint += member.point;
-            } else if (member.team === "백팀"){
+            } else if (member.team === define.getWhiteTeam()){
                 teamDoc.classList.add('text-bg-light');
                 whiteTeamTotalPoint += member.point;
             } else {
@@ -247,9 +248,9 @@ export default class MemberManager {
                 const curentTeam = member.team;
                 const blueTeamRadio = document.getElementById('memberTeamSelect1');
                 const whiteTeamRadio = document.getElementById('memberTeamSelect2');
-                if (curentTeam === '청팀') {
+                if (curentTeam === define.getBlueTeam()) {
                     blueTeamRadio.checked = true;
-                } else if (curentTeam === '백팀') {
+                } else if (curentTeam === define.getWhiteTeam()) {
                     whiteTeamRadio.checked = true;
                 } else {
                     blueTeamRadio.checked = false;

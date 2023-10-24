@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
-import FirebaseManager from "./util/manager/firebase_manager";
-import MemberManager from "./util/manager/member_manager";
-import GameManager from "./util/manager/game_manager";
+import FirebaseManager from "./manager/firebase_manager";
+import MemberManager from "./manager/member_manager";
+import GameManager from "./manager/game_manager";
 
 export default class Auth {
     static instance = null;

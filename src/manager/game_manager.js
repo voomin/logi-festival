@@ -1,9 +1,10 @@
 import { collection, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/firestore";
 import FirebaseManager from "./firebase_manager";
 import BettingManager from "./betting_manager";
-import GameModel from "../model/game_model";
+import GameModel from "../../util/model/game_model";
 import { httpsCallableFromURL } from "firebase/functions";
 import MemberManager from "./member_manager";
+import define from "../../util/define";
 
 export default class GameManager{
     static instance = null;
@@ -79,7 +80,7 @@ export default class GameManager{
         await GameManager.add(
             GameModel.createByNameAndOptions(
                 title, 
-                ['청팀', '백팀'],
+                define.teamNames,
                 teamPoint,
             ),
         );
@@ -89,26 +90,7 @@ export default class GameManager{
         await GameManager.add(
             GameModel.createByNameAndOptions(
                 title, 
-                [
-                    "노상민",
-                    "최성환",
-                    "김효상",
-                    "김형기",
-                    "심지훈",
-                    "김부민",
-                    "최수연",
-                    "서반석",
-                    "정호룡",
-                    "임종현",
-                    "박새롬",
-                    "신병우",
-                    "이주혁",
-                    "서유리",
-                    "이미르",
-                    "김상현",
-                    "박수정",
-                    "조혜선",
-                ], 
+                define.logibrosNames, 
                 teamPoint,
             ),
         );

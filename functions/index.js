@@ -4,6 +4,7 @@ const cors = require('cors')({
     origin: true
 });
 const { v4: uuidv4 } = require('uuid');
+const { default: define } = require('../util/define');
 const seoul = functions.region('asia-northeast3');
 
 admin.initializeApp();
@@ -369,10 +370,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                 }
 
                 let winnerTeam = '';
-                if (
-                    answer === "청팀"
-                    || answer === "백팀"
-                ) {
+                if (define.teamNames.includes(answer)) {
                     // 팀전
                     winnerTeam = answer;
                 } else {
