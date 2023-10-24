@@ -40,7 +40,7 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
 
-      match /members/{logId} {
+      match /logs/{logId} {
         allow read: if true;
         allow delete: if isOwner(resource.data.uid);
         allow create, update: if false;
@@ -63,7 +63,7 @@ service cloud.firestore {
         )
       );
       
-      match /games/{logId} {
+      match /logs/{logId} {
         allow read: if true;
         allow delete: if isOwner(memberId);
         allow create, update: if false;

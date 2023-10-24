@@ -131,7 +131,7 @@ export default class GameManager{
     }
 
     static async getLogsById(id) {
-        const logInGameQuerySnapshot = await getDocs(collection(FirebaseManager.db, "games", id, "members"));
+        const logInGameQuerySnapshot = await getDocs(collection(FirebaseManager.db, "games", id, "logs"));
         return logInGameQuerySnapshot.docs
             .map(doc => doc.data())
             .sort((a, b) => b.createdAt - a.createdAt);

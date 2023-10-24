@@ -74,7 +74,7 @@ export default class MemberManager {
     }
 
     static async getLogsByUid(uid) {
-        const logInMemberQuerySnapshot = await getDocs(collection(FirebaseManager.db, "members", uid, "games"));
+        const logInMemberQuerySnapshot = await getDocs(collection(FirebaseManager.db, "members", uid, "logs"));
         return logInMemberQuerySnapshot.docs
             .map(doc => doc.data())
             .sort((a, b) => b.createdAt - a.createdAt);

@@ -101,8 +101,8 @@ exports.betting = seoul.https.onRequest((req, res) => {
             const gameRef = admin.firestore().collection('games').doc(gameId);
             const logId = uuidv4();
 
-            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(logId);
-            const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('members').doc(logId);
+            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('logs').doc(logId);
+            const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('logs').doc(logId);
             
             let myPoint = 0;
 
@@ -187,7 +187,7 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
             const uid = decodedToken.uid;
             
             const userRef = admin.firestore().collection('members').doc(uid);
-            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('games').doc(logId);
+            const logInMemberRef = admin.firestore().collection('members').doc(uid).collection('logs').doc(logId);
             
             let myPoint = 0;
 
@@ -201,7 +201,7 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
                 if (log.uid !== uid) {
                     throw new Error('본인만 취소할 수 있습니다.');
                 }
-                const logInGameRef = admin.firestore().collection('games').doc(log.gameId).collection('members').doc(logId);
+                const logInGameRef = admin.firestore().collection('games').doc(log.gameId).collection('logs').doc(logId);
                 const userDoc = await transaction.get(userRef);
                 if (!userDoc.exists) {
                     throw new Error('유저가 존재하지 않습니다.');
@@ -300,7 +300,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
             const batch = admin.firestore().batch();
 
 
-            const logsInGameRef = admin.firestore().collection('games').doc(gameId).collection('members');
+            const logsInGameRef = admin.firestore().collection('games').doc(gameId).collection('logs');
             const logsInGame = await logsInGameRef.get();
             if (logsInGame.empty) {
                 throw new Error('배팅한 사람들이 존재하지 않습니다.');
@@ -326,7 +326,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
             // logsOfAnswerMember.forEach(async (log) => {
             for (const log of logsOfAnswerMember) {
                 const memberRef = admin.firestore().collection('members').doc(log.uid);
-                const logsInMemberRef = admin.firestore().collection('members').doc(log.uid).collection('games').doc(logId);
+                const logsInMemberRef = admin.firestore().collection('members').doc(log.uid).collection('logs').doc(logId);
                 const receivedPoint = Math.floor(log.bettingPoint * totalBettingPoint / totalBettingPointOfAnswerMember);
                 
                 const memberDoc = await memberRef.get();
@@ -393,7 +393,7 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                     if (member.team === winnerTeam) {
                         const teamPointLogId = uuidv4();
                         const memberRef = admin.firestore().collection('members').doc(member.uid);
-                        const logsInMemberRef = admin.firestore().collection('members').doc(member.uid).collection('games').doc(teamPointLogId);
+                        const logsInMemberRef = admin.firestore().collection('members').doc(member.uid).collection('logs').doc(teamPointLogId);
                         const receivedPoint = Number(game.teamPoint);
                         const point = Number(member.point) + receivedPointMap.get(member.uid);
 
