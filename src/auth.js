@@ -26,6 +26,7 @@ export default class Auth {
                 Auth.signInHtml(MemberManager.getInstance().me);
                 MemberManager.meInHtml(MemberManager.getInstance().me);
                 MemberManager.setListInHtml(MemberManager.getInstance().children);
+                MemberManager.setPointInHtml(MemberManager.getInstance().myPoint);
                 GameManager.setListInHtml(GameManager.getInstance().children);
             } else {
                 this.uid = null;

@@ -23,6 +23,10 @@ export default class MemberManager {
         return this.me && this.me.isAdmin;
     }
 
+    get myPoint() {
+        return this.me && this.me.point;
+    }
+
     _watching = false;
 
     constructor() {

@@ -397,9 +397,6 @@ exports.answerSet = seoul
 
             const logsInGameRef = admin.firestore().collection('games').doc(gameId).collection('logs');
             const logsInGame = await logsInGameRef.get();
-            if (logsInGame.empty) {
-                throw new Error('배팅한 사람들이 존재하지 않습니다.');
-            }
             const logs = logsInGame.docs.map(doc => doc.data());
             const totalBettingPoint = logs.reduce((acc, log) => {
                 const { bettingPoint = 0 } = log;
