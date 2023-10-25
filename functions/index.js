@@ -3,42 +3,128 @@ const admin = require('firebase-admin');
 const cors = require('cors')({
     origin: true
 });
+
 const { v4: uuidv4 } = require('uuid');
-const { default: define } = require('../util/define');
-const { default: LogModel } = require('../util/model/log_model');
 const seoul = functions.region('asia-northeast3').runWith({
     maxInstances: 20,
     enforceAppCheck: true,
 });
 
+const define = {
+    teamNames: [
+        '청팀',
+        '백팀',
+    ],
+    getBlueTeam() {
+        return this.teamNames[0];
+    },
+    getWhiteTeam() {
+        return this.teamNames[1];
+    },
+
+    logibrosNames: [
+        "노상민",
+        "최성환",
+        "김효상",
+        "김형기",
+        "심지훈",
+        "김부민",
+        "최수연",
+        "서반석",
+        "정호룡",
+        "임종현",
+        "박새롬",
+        "신병우",
+        "이주혁",
+        "서유리",
+        "이미르",
+        "김상현",
+        "박수정",
+        "조혜선",
+    ]
+};
+
+class LogModel {
+    constructor({
+        id,
+        receivedPoint, // 받은 포인트
+        bettingPoint, // 베팅 포인트
+        teamPoint, // 팀 포인트
+        selecOption,
+        gameName,
+        userName,
+        userPoint,
+        gameId,
+        uid,
+        createdAt,
+        memo,
+    }) {
+        this.id = id;
+        this.selecOption = selecOption;
+        this.bettingPoint = bettingPoint;
+        this.receivedPoint = receivedPoint;
+        this.memo = memo;
+        this.teamPoint = teamPoint;
+        this.gameName = gameName;
+        this.userName = userName;
+        this.userPoint = userPoint;
+        this.gameId = gameId;
+        this.uid = uid;
+        this.createdAt = createdAt;
+    }
+
+
+    static toJson(logModel) {
+        return {
+            id: logModel.id,
+            selecOption: logModel.selecOption,
+            bettingPoint: Number(logModel.bettingPoint),
+            receivedPoint: Number(logModel.receivedPoint),
+            teamPoint: Number(logModel.teamPoint),
+            userPoint: Number(logModel.userPoint),
+            memo: logModel.memo,
+            gameName: logModel.gameName,
+            userName: logModel.userName,
+            gameId: logModel.gameId,
+            uid: logModel.uid,
+            createdAt: logModel.createdAt,
+        };
+    }
+
+
+    static create({
+        id = uuidv4(),
+        selecOption = '',
+        bettingPoint, 
+        receivedPoint, 
+        memo = '',
+        teamPoint, 
+        gameName = '', 
+        userName = '', 
+        userPoint = 0, 
+        gameId = '', 
+        uid = '', 
+        createdAt = new Date(),
+    }) {
+        return new LogModel({
+            id: id,
+            selecOption: selecOption,
+            bettingPoint: bettingPoint,
+            receivedPoint: receivedPoint,
+            memo: memo,
+            teamPoint: teamPoint,
+            gameName: gameName,
+            userName: userName,
+            userPoint: userPoint,
+            gameId: gameId,
+            uid: uid,
+            createdAt: createdAt,
+        });
+    }
+}
+
+
 admin.initializeApp();
-
-exports.helloWorld = seoul.https.onRequest((req, res) => {
-    cors(req, res, async ()=>{
-        try {
-            const text = req.query.text || "default text";
-
-            const documentId = 'your-document-id'; // 업데이트할 Firestore 문서의 ID
-            const newData = {
-                // 업데이트할 데이터 필드 및 값
-                field1: 'new-value-1',
-                field2: 'new-value-2',
-                text,
-            };
-
-            const documentRef = admin.firestore()
-                .collection('your-collection').doc(documentId);
-            await documentRef.set(newData);
-            
-            res.send(`Hello from Firebase! text: ${text}`);
-        } catch(error) {
-            res
-                .status(500)
-                .send(`Hello from Firebase! error: ${error}`);
-        }
-
-    });
-});
 
 exports.welcomeLogibros = seoul.auth.user().onCreate((user) => {
   try {
@@ -110,6 +196,7 @@ exports.betting = seoul.https.onRequest((req, res) => {
             const logInGameRef = admin.firestore().collection('games').doc(gameId).collection('logs').doc(logId);
             
             let myPoint = 0;
+            const numberPoint = Number(point);
 
             await admin.firestore().runTransaction(async (transaction) => {
                 const gameDoc = await transaction.get(gameRef);
@@ -127,11 +214,11 @@ exports.betting = seoul.https.onRequest((req, res) => {
                     throw new Error('배팅이 중지된 게임입니다.');
                 }
 
-                if (user.point < point) {
+                if (user.point < numberPoint) {
                     throw new Error('포인트가 부족합니다.');
                 }
                 
-                user.point -= point;
+                user.point = Number(user.point) - numberPoint;
 
                 const log = LogModel.create({
                     id: logId,
@@ -258,7 +345,11 @@ exports.cancelBet = seoul.https.onRequest((req, res) => {
     });
 });
 
-exports.answerSet = seoul.https.onRequest((req, res) => {
+exports.answerSet = seoul
+    .runWith({
+        maxInstances: 3,
+    })
+    .https.onRequest((req, res) => {
     cors(req, res, async ()=>{
         try {
             const { gameId, answer } = req.query;
@@ -331,36 +422,42 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
             for (const log of logsOfAnswerMember) {
                 const memberRef = admin.firestore().collection('members').doc(log.uid);
                 const logsInMemberRef = admin.firestore().collection('members').doc(log.uid).collection('logs').doc(logId);
-                const receivedPoint = Math.floor(log.bettingPoint * totalBettingPoint / totalBettingPointOfAnswerMember);
+                const numberBettingPoint = Number(log.bettingPoint);
+                const numberTotalBettingPointOfAnswerMember = Number(totalBettingPointOfAnswerMember);
+                const numberTotalBettingPoint = Number(totalBettingPoint);
+                const numberReceivedPoint = Math.floor(numberBettingPoint * numberTotalBettingPoint / numberTotalBettingPointOfAnswerMember);
                 
                 const memberDoc = await memberRef.get();
                 if (!memberDoc.exists) {
                     throw new Error('유저가 존재하지 않습니다.');
                 }
                 const member = memberDoc.data();
-                const point = member.point;
+                const numberPoint = Number(member.point || 0);
 
+                const numberBeforeReceivedPoint = Number(receivedPointMap.get(log.uid) || 0);
                 receivedPointMap.set(log.uid, 
-                    receivedPointMap.get(log.uid) + receivedPoint);
+                    numberBeforeReceivedPoint + numberReceivedPoint);
 
                 batch.update(memberRef, {
-                    point: point + receivedPoint,
+                    point: numberPoint + numberReceivedPoint,
                 });
 
                 const receivedLog = LogModel.create({
                     id: logId,
-                    receivedPoint,
+                    receivedPoint: numberReceivedPoint,
                     selecOption: log.selecOption,
                     bettingPoint: log.bettingPoint,
                     gameName: log.gameName,
                     userName: log.userName,
-                    userPoint: log.userPoint + receivedPoint,
+                    userPoint: Number(log.userPoint || 0) + numberReceivedPoint,
                     gameId: log.gameId,
                     uid: log.uid,
                 });
 
                 batch.set(logsInMemberRef, LogModel.toJson(receivedLog));
             };
+
+            console.log('팀포인트 존재하니?', game.teamPoint);
 
             if (game.teamPoint) {
                 const membersRef = admin.firestore().collection('members');
@@ -389,13 +486,15 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                     throw new Error('우승상금 부여할 팀이 존재하지 않습니다.');
                 }
 
+                console.log('winnerTeam', winnerTeam);
+
                 for (const member of members) {
                     if (member.team === winnerTeam) {
                         const teamPointLogId = uuidv4();
                         const memberRef = admin.firestore().collection('members').doc(member.uid);
                         const logsInMemberRef = admin.firestore().collection('members').doc(member.uid).collection('logs').doc(teamPointLogId);
                         const receivedPoint = Number(game.teamPoint);
-                        const point = Number(member.point) + receivedPointMap.get(member.uid);
+                        const point = Number(member.point) + Number(receivedPointMap.get(member.uid) || 0);
 
                         batch.update(memberRef, {
                             point: point + receivedPoint,
@@ -415,11 +514,11 @@ exports.answerSet = seoul.https.onRequest((req, res) => {
                             createdAt: new Date(),
                         });
 
+                        console.log('receivedLog', JSON.stringify(receivedLog));
+
                         batch.set(logsInMemberRef, LogModel.toJson(receivedLog));
                     }
                 }
-                
-
 
             }
 
