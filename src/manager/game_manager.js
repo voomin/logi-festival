@@ -97,6 +97,39 @@ export default class GameManager{
         );
     }
 
+
+
+    static async allClear() {
+        return new Promise((resolve, reject) => {
+            const functionName = 'allClear';
+            const baseUrl = FirebaseManager.functionsApiUrl;
+            const functionUrl = `${baseUrl}/${functionName}`;
+            
+            httpsCallableFromURL(
+                FirebaseManager.functions, 
+                functionUrl,
+            )()
+                .then((result) => {
+                    // // Read result of the Cloud Function.
+                    // /** @type {any} */
+                    // const data = result.data;
+                    // const sanitizedMessage = data.text;
+                    console.log({
+                        result,
+                    });
+                    resolve(result.data);
+                }).catch(err => {
+                    console.log({
+                        err,
+                        // code,
+                        // message,
+                        // details,
+                    });
+                    resolve(err.data);
+                })
+        });
+    }
+
     static async add(game) {
         if (MemberManager.getInstance().isAdmin === false) {
             alert('관리자만 게임을 생성할 수 있습니다.');

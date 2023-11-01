@@ -150,6 +150,9 @@ export default class MemberManager {
         if (MemberManager.getInstance().isAdmin) {
             const gameCreateButton = document.getElementById('gameCreateButton');
             gameCreateButton.style.display = 'inline-block';
+
+            const allClearButton = document.getElementById('allClearButton');
+            allClearButton.style.display = 'inline-block';
         }
     }
 

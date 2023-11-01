@@ -233,6 +233,26 @@
         </div>
     </section>
 
+    <section class="my-3">
+        <div class="container px-4 px-lg-5">
+            <div class="my-3">
+                <button 
+                    id="allClearButton"
+                    style="display: none;"
+                    type="button" class="btn btn-outline-danger w-100"
+                    onclick="clickAllClear()"
+                >
+                    모두 지우기
+                </button>
+
+                <!-- spinner -->
+                <div class="spinner-border text-primary" role="status" id="allClearButtonSpinner" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+            </div>
+        </div>
+    </section>
+
 
     <!-- 배팅 모달 -->
     <div class="modal fade" id="bettingModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -578,5 +598,24 @@
             alert('이미지가 변경되었습니다.');
         }
         document.getElementById('profileImgSpinner').style.display = "none";
+    }
+
+    async function clickAllClear() {
+        const result = confirm("정말 모두 지우시겠습니까?");
+        if (result) {
+            try {
+                document.getElementById('allClearButton').style.display = "none";
+                document.getElementById('allClearButtonSpinner').style.display = "block";
+                await window.bm.class.GameManager.allClear();
+
+            } catch(err) {
+                console.error(err);
+                alert('초기화에 실패했습니다. ' + err.message);
+            } finally {
+                document.getElementById('allClearButtonSpinner').style.display = "none";
+                document.getElementById('allClearButton').style.display = "block";
+            }
+
+        }
     }
 </script>

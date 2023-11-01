@@ -10,6 +10,8 @@ const seoul = functions.region('asia-northeast3').runWith({
     enforceAppCheck: true,
 });
 
+const initPoint = 1000;
+
 const define = {
     teamNames: [
         '청팀',
@@ -141,7 +143,7 @@ exports.welcomeLogibros = seoul.auth.user().onCreate((user) => {
       name: displayName,
       email,
       photoURL,
-      point: 1000,
+      point: initPoint,
       team: '',
     });
 
@@ -530,6 +532,107 @@ exports.answerSet = seoul
             res.json({
                 data: {
                     answer,
+                }
+            });
+
+        } catch(error) {
+            res
+                .json({
+                    data: {
+                        isErr: true,
+                        message: error.message,
+                    }
+                });
+        }
+    });
+});
+
+
+exports.allClear = seoul
+    .runWith({
+        maxInstances: 1,
+    })
+    .https.onRequest((req, res) => {
+    cors(req, res, async ()=>{
+        try {
+            // TODO. admin인지 확인
+            let idToken = req.headers.authorization;
+            if (idToken.startsWith('Bearer ')) {
+                idToken = idToken.slice(7, idToken.length);
+            }
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const uid = decodedToken.uid;
+            const userRef = admin.firestore().collection('members').doc(uid);
+            const userDoc = await userRef.get();
+            if (!userDoc.exists) {
+                throw new Error('유저가 존재하지 않습니다.');
+            }
+            const user = userDoc.data();
+            const isAdmin = user.isAdmin;
+            if (!isAdmin) {
+                throw new Error('관리자가 아닙니다.');
+            }
+
+            // TODO. 모든 게임의 isOnBetting을 true로 변경
+            // TODO. 모든 게임의 answer를 삭제
+            // TODO. 모든 게임의 logs를 삭제
+            const gamesRef = admin.firestore().collection('games');
+            const gamesSnapshot = await gamesRef.get();
+            const games = gamesSnapshot.docs.map(doc => doc.data());
+            if (games.empty) {
+                throw new Error('게임 정보들이 존재하지 않습니다.');
+            }
+            const batch = admin.firestore().batch();
+            for (const game of games) {
+                const gameRef = admin.firestore().collection('games').doc(game.id);
+                batch.update(gameRef, {
+                    isOnBetting: true,
+                    answer: '',
+                });
+
+                const logsRef = admin.firestore().collection('games').doc(game.id).collection('logs');
+                const logsSnapshot = await logsRef.get();
+                const logs = logsSnapshot.docs.map(doc => doc.data());
+                if (logs.empty) {
+                    continue;
+                }
+                for (const log of logs) {
+                    const logRef = admin.firestore().collection('games').doc(game.id).collection('logs').doc(log.id);
+                    batch.delete(logRef);
+                }
+            }
+
+
+            // TODO. 모든 회원의 포인트를 1000으로 변경
+            // TODO. 모든 회원의 logs를 삭제
+            const membersRef = admin.firestore().collection('members');
+            const membersSnapshot = await membersRef.get();
+            const members = membersSnapshot.docs.map(doc => doc.data());
+            if (members.empty) {
+                throw new Error('회원 정보들이 존재하지 않습니다.');
+            }
+            for (const member of members) {
+                const memberRef = admin.firestore().collection('members').doc(member.uid);
+                batch.update(memberRef, {
+                    point: initPoint,
+                });
+
+                const logsRef = admin.firestore().collection('members').doc(member.uid).collection('logs');
+                const logsSnapshot = await logsRef.get();
+                const logs = logsSnapshot.docs.map(doc => doc.data());
+                if (logs.empty) {
+                    continue;
+                }
+                for (const log of logs) {
+                    const logRef = admin.firestore().collection('members').doc(member.uid).collection('logs').doc(log.id);
+                    batch.delete(logRef);
+                }
+            }
+
+            await batch.commit();
+            
+            res.json({
+                data: {
                 }
             });
 
