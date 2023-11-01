@@ -43,6 +43,7 @@ const define = {
         "김상현",
         "박수정",
         "조혜선",
+        '박관석',
     ]
 };
 
@@ -630,7 +631,7 @@ exports.allClear = seoul
             }
 
             await batch.commit();
-            
+
             res.json({
                 data: {
                 }

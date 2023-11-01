@@ -17,6 +17,7 @@ export default {
         '이미르',
         '김상현',
         '박수정',
+        '박관석',
     ],
     player: {
         initPoint: 1000,
