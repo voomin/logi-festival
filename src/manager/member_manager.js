@@ -163,6 +163,8 @@ export default class MemberManager {
 
         let blueTeamTotalPoint = 0;
         let whiteTeamTotalPoint = 0;
+        let blutTeamCount = 0;
+        let whiteTeamCount = 0;
 
         members.forEach((member, index) => {
             const li = document.createElement('li');
@@ -189,9 +191,11 @@ export default class MemberManager {
             if (member.team === define.getBlueTeam()) {
                 teamDoc.classList.add('bg-primary');
                 blueTeamTotalPoint += member.point;
+                blutTeamCount++;
             } else if (member.team === define.getWhiteTeam()){
                 teamDoc.classList.add('text-bg-light');
                 whiteTeamTotalPoint += member.point;
+                whiteTeamCount++;
             } else {
                 teamDoc.classList.add('text-bg-warning');
             }
@@ -334,12 +338,17 @@ export default class MemberManager {
             if (blueTeamTotalPoint + whiteTeamTotalPoint <= 0) {
                 throw new Error('포인트가 없습니다.');
             }
-            const blueTemaProgressPercent = Math.floor(blueTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
-            const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
+            const blueTeamAveragePoint = Math.floor(blueTeamTotalPoint / blutTeamCount);
+            const whiteTeamAveragePoint = Math.floor(whiteTeamTotalPoint / whiteTeamCount);
+            const blueTemaProgressPercent = Math.floor(blueTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100);
+            const whiteTemaProgressPercent = Math.floor(whiteTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100);
+
+            // const blueTemaProgressPercent = Math.floor(blueTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
+            // const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
             blueTemaProgress.style.width = blueTemaProgressPercent + '%';
             whiteTemaProgress.style.width = whiteTemaProgressPercent + '%';
-            blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (' + blueTeamTotalPoint + 'p)';
-            whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (' + whiteTeamTotalPoint + 'p)';
+            blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (≈' + blueTeamAveragePoint + 'p)';
+            whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (≈' + whiteTeamAveragePoint + 'p)';
             
         } catch(err) {
             blueTemaProgress.style.width = 50 + '%';
