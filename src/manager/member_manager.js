@@ -340,11 +340,9 @@ export default class MemberManager {
             }
             const blueTeamAveragePoint = Math.floor(blueTeamTotalPoint / blutTeamCount);
             const whiteTeamAveragePoint = Math.floor(whiteTeamTotalPoint / whiteTeamCount);
-            const blueTemaProgressPercent = Math.floor(blueTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100);
-            const whiteTemaProgressPercent = Math.floor(whiteTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100);
-
-            // const blueTemaProgressPercent = Math.floor(blueTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
-            // const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
+            const blueTemaProgressPercent = (blueTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100).toFixed(2);
+            const whiteTemaProgressPercent = (whiteTeamAveragePoint / (blueTeamAveragePoint + whiteTeamAveragePoint) * 100).toFixed(2);
+            
             blueTemaProgress.style.width = blueTemaProgressPercent + '%';
             whiteTemaProgress.style.width = whiteTemaProgressPercent + '%';
             blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (≈' + blueTeamAveragePoint + 'p)' + '\n' + blueTeamTotalPoint + 'p' + ' / ' + blutTeamCount + '명';
