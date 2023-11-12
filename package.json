@@ -1,11 +1,13 @@
 {
   "name": "logi-festival",
   "version": "1.0.0",
-  "description": "",
-  "main": "key.js",
+  "description": "로지 운동회 관련 WEB 사이트",
   "scripts": {
-    "serve": "yarn webpack serve --mode development",
-    "build": "yarn webpack build --mode production",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
     "start:emulators": "firebase emulators:start",
     "deploy": "npm run build && firebase deploy",
     "deploy:hosting": "npm run build && firebase deploy --only hosting"
@@ -15,27 +17,19 @@
     "url": "git+https://github.com/voomin/logi-festival.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/voomin/logi-festival/issues"
-  },
+  "author": "BoominKim bm33728090@gmail.com",
   "engines": {
     "node": "18"
   },
   "homepage": "https://github.com/voomin/logi-festival#readme",
   "devDependencies": {
-    "@webpack-cli/generators": "^3.0.7",
-    "copy-webpack-plugin": "^10.0.0",
-    "css-loader": "^6.8.1",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.3.1",
-    "style-loader": "^3.3.3",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "@nuxt/devtools": "latest",
+    "nuxt": "^3.8.1",
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
     "firebase": "^10.4.0",
     "uuid": "^9.0.1"
   }
