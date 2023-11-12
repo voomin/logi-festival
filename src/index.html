@@ -134,12 +134,12 @@
         </div> -->
     </div>
 
-    <div class="my-5"></div>
-
+    <div style="height: 58px;"></div>
 
     <!-- 대시보드(progress) 청팀 vs 백팀 -->
-    <section class="my-3 pt-3">
+    <section class="my-3">
         <div class="container px-4 px-lg-5">
+            <h1 class="fw-light text-center mb-3">청팀 vs 백팀</h1>
             <div 
                 class="progress-stacked border border-dark"
                 style="height: 50px;"
@@ -176,7 +176,7 @@
                 <li class="nav-item">
                 <button 
                     id="gameTabButton"
-                class="nav-link" onclick="clickGameTab()">운동</button>
+                class="nav-link" onclick="clickGameTab()">운동/배팅</button>
                 </li>
             </ul>
         </div>
@@ -234,13 +234,15 @@
         </div>
     </section>
 
+    <div style="height: 150px;"></div>
+
     <!-- 모두지우기 버튼 -->
     <section class="my-3">
         <div class="container px-4 px-lg-5">
             <div class="my-3">
                 <button 
                     id="allClearButton"
-                    style="display: none; margin-top: 300px;"
+                    style="display: none; margin-top: 200px;"
                     type="button" class="btn btn-outline-danger w-100"
                     onclick="clickAllClear()"
                 >
@@ -542,6 +544,24 @@
         </div>
         </div>
     </div>
+
+    <footer class="text-bg-light">
+        <div class="container px-4 px-lg-5 py-3">
+            <div class="small text-muted">
+                <p>로지 브라더스를 위한 운동회 페이지입니다.</p>
+                <p>
+                    로그인은 Google이메일만 사용됩니다.
+                    개인정보 수집은 이메일, 프로필URL, 이름, 포인트, 팀, 배팅 이력만 수집됩니다.
+                </p>
+                <p>
+                    Author: Boomin Kim,
+                    Email: bm33728090@logibros.com
+                </p>
+                <p>© Boomin Kim 2023</p>
+                <a href="https://github.com/voomin/logi-festival">GitHub</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
 <script>
