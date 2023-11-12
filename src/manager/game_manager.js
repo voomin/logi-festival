@@ -373,13 +373,13 @@ export default class GameManager{
         }
 
         // game-not-activated 가리기
-        const gameNotActivated = document.querySelectorAll('.game-not-activated');
-        console.log({
-            gameNotActivated,
-        });
-        gameNotActivated.forEach((game) => {
-            game.classList.add('d-none');
-        }); 
+        // const gameNotActivated = document.querySelectorAll('.game-not-activated');
+        // console.log({
+        //     gameNotActivated,
+        // });
+        // gameNotActivated.forEach((game) => {
+        //     game.classList.add('d-none');
+        // }); 
     }
 
     static allView() {

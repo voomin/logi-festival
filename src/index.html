@@ -136,12 +136,8 @@
 
     <div class="my-5"></div>
 
-    <!-- <section class="container mx-auto my-3 text-center" id="memberBox2" style="display: none;">
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bettingModal">
-            배팅하기
-        </button>
-    </section> -->
 
+    <!-- 대시보드(progress) 청팀 vs 백팀 -->
     <section class="my-3 pt-3">
         <div class="container px-4 px-lg-5">
             <div 
@@ -168,34 +164,40 @@
         </div>
     </section>
 
-    <section id="ranking" class="my-3">
+    <!-- 탭 -->
+    <section>
         <div class="container px-4 px-lg-5">
-            <div class="accordion" id="accordionExample">
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        순위
-                    </button>
-                  </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        <div id="rankBox">
-                            <ol class="list-group">
-                                <!-- <li class="list-group-item">A list item</li>
-                                <li class="list-group-item">A list item</li>
-                                <li class="list-group-item">A list item</li> -->
-                            </ol>
-                        </div>
-                    </div>
-                  </div>
-                </div>
+            <ul class="nav nav-underline">
+                <li class="nav-item">
+                <button 
+                    id="rankingTabButton"
+                    class="nav-link active" onclick="clickRankingTab()">선수</button>
+                </li>
+                <li class="nav-item">
+                <button 
+                    id="gameTabButton"
+                class="nav-link" onclick="clickGameTab()">운동</button>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 랭킹 -->
+    <section id="rankingSection" class="my-3">
+        <div class="container px-4 px-lg-5">
+            <div id="rankBox">
+                <ol class="list-group">
+                    <!-- <li class="list-group-item">A list item</li>
+                    <li class="list-group-item">A list item</li>
+                    <li class="list-group-item">A list item</li> -->
+                </ol>
             </div>
         </div>
     </section>
 
-    <section class="my-3">
+    <!-- 운동 -->
+    <section id="gameSection" class="my-3" style="display: none;">
         <div class="container px-4 px-lg-5">
-            <h5>운동</h5>
             <!-- 운동 추가하기 버튼 -->
             <div class="my-3">
                 <button 
@@ -212,15 +214,14 @@
             <p id="gameListEmpty" class="text-center" style="display: none;">
                 대기중인 운동이 없습니다.
             </p>
-            <div class="text-end">
-                <!-- 모두보기 text버튼 -->
+
+            <!-- <div class="text-end">
                 <button 
                     id="gameAllViewButton"
                     type="button" class="btn btn-link" 
                     onclick="window.bm.class.GameManager.allView()">
                     모두보기
                 </button>
-                <!-- 간략히 -->
                 <button 
                     id="gameSimpleViewButton"
                     style="display: none;"
@@ -228,17 +229,18 @@
                     onclick="window.bm.class.GameManager.onlyActivatedView()">
                     간략히
                 </button>
-            </div>
+            </div> -->
 
         </div>
     </section>
 
+    <!-- 모두지우기 버튼 -->
     <section class="my-3">
         <div class="container px-4 px-lg-5">
             <div class="my-3">
                 <button 
                     id="allClearButton"
-                    style="display: none;"
+                    style="display: none; margin-top: 300px;"
                     type="button" class="btn btn-outline-danger w-100"
                     onclick="clickAllClear()"
                 >
@@ -573,6 +575,24 @@
         document.getElementById('gameCreateSubmitButton').style.display = "block";
         document.getElementById('gameCreateSubmitSpinner').style.display = "none";
 
+    }
+
+    function clickRankingTab() {
+        document.getElementById('rankingSection').style.display = "block";
+        document.getElementById('gameSection').style.display = "none";
+        const gameTabButton = document.getElementById('gameTabButton');
+        gameTabButton.classList.remove('active');
+        const rankingTabButton = document.getElementById('rankingTabButton');
+        rankingTabButton.classList.add('active');
+    }
+
+    function clickGameTab() {
+        document.getElementById('rankingSection').style.display = "none";
+        document.getElementById('gameSection').style.display = "block";
+        const gameTabButton = document.getElementById('gameTabButton');
+        gameTabButton.classList.add('active');
+        const rankingTabButton = document.getElementById('rankingTabButton');
+        rankingTabButton.classList.remove('active');
     }
 
     async function clickPhotoUrlChange() {
