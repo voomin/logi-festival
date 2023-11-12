@@ -347,8 +347,8 @@ export default class MemberManager {
             // const whiteTemaProgressPercent = Math.floor(whiteTeamTotalPoint / (blueTeamTotalPoint + whiteTeamTotalPoint) * 100);
             blueTemaProgress.style.width = blueTemaProgressPercent + '%';
             whiteTemaProgress.style.width = whiteTemaProgressPercent + '%';
-            blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (≈' + blueTeamAveragePoint + 'p)';
-            whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (≈' + whiteTeamAveragePoint + 'p)';
+            blueTemaProgressText.innerText = blueTemaProgressPercent + '%' + ' (≈' + blueTeamAveragePoint + 'p)' + '\n' + blueTeamTotalPoint + 'p' + ' / ' + blutTeamCount + '명';
+            whiteTemaProgressText.innerText = whiteTemaProgressPercent + '%' + ' (≈' + whiteTeamAveragePoint + 'p)' + '\n' + whiteTeamTotalPoint + 'p' + ' / ' + whiteTeamCount + '명';
             
         } catch(err) {
             blueTemaProgress.style.width = 50 + '%';
